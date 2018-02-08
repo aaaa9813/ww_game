@@ -38,5 +38,6 @@ class CBaseUser:public CBase
 			m_bReady = b;
 		}
 
+		unsigned int m_iState;
 };
 #endif

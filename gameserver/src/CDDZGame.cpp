@@ -177,7 +177,7 @@ void CDDZGame::Shuffle() {
 	m_iChuPaiUser = -1;
 }
 
-bool CDDZGame::StartGame() {
+void CDDZGame::StartGame() {
 	//CBaseTable::StartGame();
 
 #ifdef DDZ_DEBUG
@@ -190,7 +190,7 @@ bool CDDZGame::StartGame() {
 	for (int i = 0; i < 3; ++i) {
 		m_pUsers[i]->m_iState = US_INGAME;
 
-		memcpy(m_UserInfo[i].m_wPai, &m_wPai[m_iNext], sizeof(int) * 17);
+		memcpy(m_UserInfo[i].m_wPai, &m_iPai[m_iNext], sizeof(int) * 17);
 		m_iNext += 17;
 
 		m_UserInfo[i].m_bIsDiZhu = false;
@@ -200,45 +200,29 @@ bool CDDZGame::StartGame() {
 		m_UserInfo[i].m_iChuPaiNum = 0;
 	}
 
-	//data statrt
-//	PT_DDZ_GAME_START_INFO data;
-//	data.wNum = num;
-//	SendToAllUser( &data, sizeof(data) );
+	memcpy(m_iDiPai, &m_iPai[m_iNext], sizeof(int) * 3);
 
-	//data1 pai
-//	PT_DDZ_PAI_INFO data1;
-//	for( int i = 0; i < 3; ++ i )
-//	{
-//		data1.dwUserId = m_pUsers[i]->m_dwUserId;
-//		memcpy( data1.wPai, m_UserInfo[i].m_wPai, sizeof(int) * 17 );
-//		g_ServerApp.SendToAgentServer( m_pUsers[i]->m_dwAgentIndex, &data1, sizeof(data1) );
-//	}
-//
-//	for( int i = 0; i < m_iLookerNum; ++ i )
-//	{
-//		data1.dwUserId = m_pLookers[i]->m_dwUserId;
-//		memcpy( data1.wPai, m_UserInfo[m_pLookers[i]->m_pLookAt->m_iChairId].m_wPai, sizeof(int) * 17 );
-//		g_ServerApp.SendToAgentServer( m_pUsers[i]->m_dwAgentIndex, &data1, sizeof(data1) );
-//	}
 
-	int m_dipai[] = { 1, 2, 3 };
 
 	for (int i = 0; i < 3; i++) {
 
 		PT_DDZ_GAME_START_INFO data;
 
-		memcpy(data.dipai, m_dipai, sizeof(int) * 3);
-		memcpy(data.pai, m_User[i].pai, sizeof(int) * 17);
+		memcpy(data.dipai, m_iDiPai, sizeof(int) * 3);
+		memcpy(data.pai, m_UserInfo[i].m_wPai, sizeof(int) * 17);
 
-		g_Server.SendData((char *) &data, sizeof(data), m_User[i].Uid);
+		g_Server.SendData((char *) &data, sizeof(data), m_UserInfo[i].Uid);
 	}
 
 	if (m_pUsers[m_dwCurUser]->m_bDrop)
+	{
 		SET_TIMER_ONCE(WAIT_DDZ_JIAOFEN);
+	}
 	else
-	SET_TIMER_ONCE(WAIT_DDZ_JIAOFEN_OFFLINE);
+	{
+		SET_TIMER_ONCE(WAIT_DDZ_JIAOFEN_OFFLINE);
+	}
 
-	return true;
 }
 
 bool CDDZGame::ProHostMsgByStream(unsigned int uid, unsigned char * data,

@@ -38,6 +38,7 @@ struct SDDZUser {
 		m_wPaiNum = 17;
 		m_iChuPaiNum = 0;
 	}
+	unsigned int Uid;
 	int m_wPai[20];					//玩家手里的牌
 	int m_wPaiNum;					//牌的数量
 
@@ -50,6 +51,8 @@ struct SDDZUser {
 	double m_dCountScore;			//总成绩
 
 	int m_iChuPaiNum;				//出牌次数
+
+
 
 };
 
