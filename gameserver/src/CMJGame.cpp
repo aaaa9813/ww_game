@@ -21,11 +21,11 @@ if(pUser->GetIndex() != m_nCurIndex)					\
 	return;												\
 }
 
-#define SET_TIMER_ONCE(name)\
-	SetTimer(name, name##_TIME, true);
-
-#define SET_TIMER(name)\
-	SetTimer(name, name##_TIME, false);
+//#define SET_TIMER_ONCE(name)\
+//	SetTimer(name, name##_TIME, true);
+//
+//#define SET_TIMER(name)\
+//	SetTimer(name, name##_TIME, false);
 
 CMJGame::CMJGame() {
 	InitCard();

@@ -5,6 +5,14 @@
 using namespace std;
 
 
+#define SET_TIMER_ONCE(name)\
+	SetTimer(name, name##_TIME, true);
+
+#define SET_TIMER(name)\
+	SetTimer(name, name##_TIME, false);
+
+
+
 
 class CBase
 {

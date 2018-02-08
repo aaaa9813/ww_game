@@ -14,6 +14,10 @@ class CBaseUser:public CBase
 		bool		 m_bReady;
 
 	public:
+
+		///true, off-line; false, on-line
+		bool 		m_bDrop;
+
 		unsigned int GetIndex()
 		{
 			return m_nIndex;
