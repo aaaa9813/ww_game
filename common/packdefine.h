@@ -223,8 +223,6 @@ enum HOSTMSG {
 	PT_MJ_WAIT_USER_OPT,
 	PT_MJ_END_GAME,
 
-
-
 	//=====ddz================
 
 	PT_DDZ_CHUPAI = 200,
@@ -236,6 +234,8 @@ enum HOSTMSG {
 	PT_DDZ_USER_PASS,
 
 	PT_DDZ_GAME_START,
+	PT_DDZ_DZPAI,
+	PT_DDZ_USER_JIAOPAI,
 };
 enum OPT_TYPE {
 	OPT_TYPE_DAPAI = 0, OPT_TYPE_GANG, OPT_TYPE_PENG, OPT_TYPE_MOPAI,
@@ -303,7 +303,31 @@ struct PT_ENTER_GAME_ACCEPT_INFO ///<进入Game成功
 			id(PT_ENTER_GAME_ACCEPT) {
 	}
 };
+struct PT_DDZ_USER_JIAOPAI_INFO {
+	unsigned char id;
 
+	int nMsgid;
+
+	unsigned int nUid;
+	unsigned int nNum;
+	PT_DDZ_USER_JIAOPAI_INFO() :
+
+			id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_USER_JIAOPAI) {
+	}
+};
+
+struct PT_DDZ_USER_PASS_INFO {
+	unsigned char id;
+
+	int nMsgid;
+
+	unsigned int nUid;
+
+	PT_DDZ_USER_PASS_INFO() :
+
+			id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_USER_PASS) {
+	}
+};
 struct PT_DDZ_GAME_START_INFO {
 
 	unsigned char id;
@@ -319,28 +343,39 @@ struct PT_DDZ_GAME_START_INFO {
 
 	PT_DDZ_GAME_START_INFO() :
 
-		id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_GAME_START) {
+			id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_GAME_START) {
+	}
+};
+struct PT_DDZ_DZPAI_INFO {
+	unsigned char id;
+
+	int nMsgid;
+
+	int wPai[3];
+	int wScore;
+	unsigned int dwUserId;
+
+	PT_DDZ_DZPAI_INFO() :
+
+			id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_DZPAI) {
 	}
 };
 
-struct SUserIndexInfo
-{
+struct SUserIndexInfo {
 	unsigned int uid;
 	unsigned int index;
 };
-struct PT_MJ_MATCH_ACCEPT_INFO
-{
+struct PT_MJ_MATCH_ACCEPT_INFO {
 	unsigned char id_1;
 	unsigned int id_2;
-
 
 	unsigned int serverid;
 	unsigned int gameid;
 
 	SUserIndexInfo userindex[4];
-	PT_MJ_MATCH_ACCEPT_INFO():
+	PT_MJ_MATCH_ACCEPT_INFO() :
 
-		id_1(PT_HOST_MESSAGE), id_2(PT_MJ_MATCH_ACCEPT) {
+			id_1(PT_HOST_MESSAGE), id_2(PT_MJ_MATCH_ACCEPT) {
 	}
 };
 
@@ -926,7 +961,6 @@ enum UserOnTimerID {
 	WAIT_DDZ_DAPAI,
 	WAIT_DDZ_JIAOFEN_OFFLINE,
 	WAIT_DDZ_DAPAI_OFFLINE,
-
 
 };
 

@@ -29,7 +29,23 @@ class CPlayer;
 //		return this;
 //	}
 //};
-
+enum DDZ_PAI_TYPE {
+	PAI_TYPE_NONE,
+	PAI_TYPE_ROCKET,
+	PAI_TYPE_BOMB,
+	PAI_TYPE_DANSHUN,
+	PAI_TYPE_SHUANGSHUN,
+	PAI_TYPE_SANSHUN,
+	PAI_TYPE_SANDAIYISINGLE,
+	PAI_TYPE_SANDAIYIDOUBLE,
+	PAI_TYPE_PLANESINGLE,
+	PAI_TYPE_PLANEDOUBLE,
+	PAI_TYPE_SIDAIERSINGLE,
+	PAI_TYPE_SIDAIERDOUBLE,
+	PAI_TYPE_THREE,
+	PAI_TYPE_DOUBLE,
+	PAI_TYPE_SINGLE,
+};
 struct SDDZUser {
 
 	SDDZUser() {
@@ -51,8 +67,6 @@ struct SDDZUser {
 	double m_dCountScore;			//总成绩
 
 	int m_iChuPaiNum;				//出牌次数
-
-
 
 };
 
@@ -78,15 +92,60 @@ public:
 	void JiaoPai(CPlayer * pUser, int num);
 
 	void StartGame();
+	void SetDiZhu(CPlayer * pUser, int num);
+
+
 
 protected:
 	void Reset();
 
 	void Shuffle();
 
+	void MoveCurPointer();
+
+	void SortCard(SDDZPai Card[], int num);
+	// 出牌检测
+	bool ChuPaiCheck(CPlayer * pUser, int pai[], int num);
+	// 检测是否为火箭牌型
+	bool _IsRocket(SDDZPai pai[], int num);
+	// 检测是否为炸弹牌型
+	int _IsBomb(SDDZPai pai[], int num);
+	// 检测是否为单顺牌型
+	int _IsDanShun(SDDZPai pai[], int num);
+	// 检测是否为双顺牌型
+	int _IsShuangShun(SDDZPai pai[], int num);
+	// 检测是否为三顺牌型
+	int _IsSanShun(SDDZPai pai[], int num);
+	// 检测是否为三带一牌型(单张)
+	int _IsSanDaiYiSingle(SDDZPai pai[], int num);
+	// 检测是否为三带一牌型(对儿)
+	int _IsSanDaiYiDouble(SDDZPai pai[], int num);
+	// 检测是否为飞机带翅膀牌型(单张)
+	int _IsPlaneSingle(SDDZPai pia[], int num);
+	// 检测是否为飞机带翅膀牌型(对儿)
+	int _IsPlaneDouble(SDDZPai pia[], int num);
+	// 检测是否为四带二牌型(单张)
+	int _IsSiDaiErSingle(SDDZPai pai[], int num);
+	// 检测是否为四带二牌型(对儿)
+	int _IsSiDaiErDouble(SDDZPai pai[], int num);
+	// 检测是否为对儿
+	int _Is2(SDDZPai pai[], int num);
+	// 栓测是否为三张牌
+	int _Is3(SDDZPai pai[], int num);
+	// 检测牌的类型
+	int CheckPaiType(SDDZPai pai[], int num, int &PaiSize);
+	// 获得相同牌的个数
+	int GetCardCountByCardNum(SDDZPai pai[], int num, int PaiNum);
+
+	bool HaveTheCard(CPlayer * pUser, int pai);
+
+	void MoveAbandonCardToArrayLast( CPlayer * pUser, int AbandonPai[], int AbandonNum );
+	void WinBalance( bool bIsDiZhu );
+	void EndGame();
+	void ResetTablePai();
 public:
 
-	CBaseUser **	m_pUsers;
+	CBaseUser ** m_pUsers;
 	int m_iNext;					//下张牌
 	int m_iLast;					//最后张牌
 
@@ -110,6 +169,9 @@ public:
 	int m_iCurJiaoFen;				//当前叫的分
 
 	bool m_bInGame;					//true gaming
+
+
+
 
 protected:
 	unsigned int m_dwId;

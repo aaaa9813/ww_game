@@ -3,7 +3,7 @@ CPlayer::CPlayer()
 {
 	m_nGameId = -1;
 	m_bReady = false;
-	m_nChairId = -1;
+	m_iChairId = -1;
 	m_bDisconnect = false;
 	m_nProxyServerId = -1;
 }
@@ -16,6 +16,6 @@ void CPlayer::Reset()
 {
 	m_nGameId = -1;
 	m_bReady = false;
-	m_nChairId = -1;
+	m_iChairId = -1;
 	m_bDisconnect = false;
 }
