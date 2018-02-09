@@ -52,7 +52,7 @@ void CDDZGame::Reset() {
 
 	//random
 	int num = rand() % 3;
-	m_dwCurUser = num;
+	m_nCurUser = num;
 
 	m_bInGame = true;
 
@@ -213,7 +213,7 @@ void CDDZGame::StartGame() {
 		g_Server.SendData((char *) &data, sizeof(data), m_UserInfo[i].Uid);
 	}
 
-	if (!m_pUsers[m_dwCurUser]->m_bDrop) {
+	if (!m_pUsers[m_nCurUser]->m_bDrop) {
 		SET_TIMER_ONCE(WAIT_DDZ_JIAOFEN);
 	} else {
 		SET_TIMER_ONCE(WAIT_DDZ_JIAOFEN_OFFLINE);
@@ -265,7 +265,7 @@ bool CDDZGame::EnterGame(unsigned int uid, unsigned int &nIndex) {
 		}
 		pUser->SetIndex(nIndex);
 
-		//	SET_TIMER_ONCE(ONTIMER_WAIT_READY);
+		SET_TIMER_ONCE(ONTIMER_WAIT_READY);
 
 		return true;
 	}
@@ -281,7 +281,7 @@ void CDDZGame::PassPai(CPlayer *pUser)
 	if( m_iPassCount == 2 )
 		return;
 
-	if( pUser != m_pUsers[m_dwCurUser] )
+	if( pUser != m_pUsers[m_nCurUser] )
 		return;
 
 	PT_DDZ_USER_PASS_INFO data;
@@ -293,7 +293,7 @@ void CDDZGame::PassPai(CPlayer *pUser)
 	MoveCurPointer();
 
 
-	if (m_pUsers[m_dwCurUser]->m_bDrop) {
+	if (m_pUsers[m_nCurUser]->m_bDrop) {
 		SET_TIMER_ONCE(WAIT_DDZ_DAPAI_OFFLINE);
 	} else {
 		SET_TIMER_ONCE(WAIT_DDZ_DAPAI);
@@ -348,7 +348,7 @@ void CDDZGame::ChuPai( CPlayer * pUser, int pai[], int num )
 {
 	if( !m_bInGame || !m_bHasDiZhu )
 		return;
-	if( pUser != m_pUsers[m_dwCurUser] )
+	if( pUser != m_pUsers[m_nCurUser] )
 		return;
 
 assert(num>0);
@@ -360,26 +360,23 @@ assert(num>0);
 		//==
 		MoveAbandonCardToArrayLast( pUser, pai, num );
 
-//		PT_DDZ_USER_CHUPAI_INFO data;
-//		data.wNum = num;
-//		data.dwUserId = pUser->m_dwUserId;
-//		memcpy( data.wPai, pai, sizeof( int ) * num );
-//
+		PT_DDZ_USER_CHUPAI_INFO data;
+		data.nNum = num;
+		data.nUid = pUser->GetId();
+		memcpy( data.nPai, pai, sizeof( int ) * num );
+
 //		for( int i = 0; i < num; i++ )
 //		{
 //			SDDZPai * p = GetDDZPaiInfo( pai[i] );
 //
-//
 //		}
-//
-//		SendToAllUser( &data, sizeof( data ) );
 
-		/*CString str;
-		str.Format( L"%s出牌\n",pUser->m_szUserName );
-		Print( str.GetBuffer() );*/
+		this->SendtoAll((char *)&data, sizeof( data ));
 
 
-		if (m_pUsers[m_dwCurUser]->m_bDrop) {
+
+
+		if (m_pUsers[m_nCurUser]->m_bDrop) {
 			SET_TIMER_ONCE(WAIT_DDZ_DAPAI_OFFLINE);
 		} else {
 			SET_TIMER_ONCE(WAIT_DDZ_DAPAI);
@@ -448,14 +445,14 @@ void CDDZGame::EndGame()
 	Print( g_strText.GetBuffer() );
 #endif
 
-	//PT_DDZ_GAME_END_INFO data;
-	//data.dwTableId = m_dwId;
-	//for( int i = 0; i < 3; i++ )
-	//{
-	//	data.wNum[i] = m_UserInfo[i].m_wPaiNum;
-	//	memcpy( data.wPai[i], m_UserInfo[i].m_wPai, sizeof(int) * m_UserInfo[i].m_wPaiNum );
-	//}
-	//m_pRoom->SendToAllUser( &data, sizeof(data) );
+	PT_DDZ_GAME_END_INFO data;
+	data.nGameId= this->GetId();
+	for( int i = 0; i < 3; i++ )
+	{
+		data.nPaiNum[i] = m_UserInfo[i].m_wPaiNum;
+		memcpy(data.nPai, m_UserInfo[i].m_wPai, sizeof(int) * m_UserInfo[i].m_wPaiNum );
+	}
+	this->SendtoAll((char*) &data, sizeof(data) );
 
 
 //	PT_UPDATE_SCORE_INFO data3;
@@ -510,9 +507,9 @@ void CDDZGame::EndGame()
 }
 void CDDZGame::WinBalance( bool bIsDiZhu )
 {
-//	int iNumOfBombPlusRocketPlusChunTian = m_iNumOfBomb + m_iNumOfRocket + m_iChunTianOrFanChun;
-//	//int iBaseScore = ((CDDZ_Room *)m_pRoom)->GetBaseScore();
-//	int iBaseScore = 0;
+	int iNumOfBombPlusRocketPlusChunTian = m_iNumOfBomb + m_iNumOfRocket + m_iChunTianOrFanChun;
+	//int iBaseScore = ((CDDZ_Room *)m_pRoom)->GetBaseScore();
+	int iBaseScore = 0;
 //	if( m_pRoom->m_iScoreType == SCORE_MATCH )
 //	{
 //		iBaseScore = m_iBaseScore;
@@ -523,76 +520,79 @@ void CDDZGame::WinBalance( bool bIsDiZhu )
 //	}
 //	double dTax = ((CDDZ_Room *)m_pRoom)->GetTax() / 100.0;//税率
 //	int iScoreType = ((CDDZ_Room *)m_pRoom)->GetScoreType();
-//
-//	__int64 iDiZhuMoney = 0;
-//	__int64 iNongMinMoney = 0;
-//
-//	__int64 LostMoney[3];
-//
-//	int iFinallyScore = m_iCurJiaoFen * (int)pow( 2, iNumOfBombPlusRocketPlusChunTian ) * iBaseScore;
-//	for( int i = 0; i < 3; i++ )
-//	{
-//		m_UserInfo[i].m_dCountScore = 0;
-//		if( m_UserInfo[i].m_bIsDiZhu )
-//		{
-//			if( iScoreType == SCORE_BEAN )
-//			{
-//				LostMoney[i] = m_pUsers[i]->m_lHappyBean >=  2 * iFinallyScore ? 2 * iFinallyScore : m_pUsers[i]->m_lHappyBean;
-//			}
-//			else if( iScoreType == SCORE_GOLD )
-//			{
-//				LostMoney[i] = m_pUsers[i]->m_lMoney >=  2 * iFinallyScore ? 2 * iFinallyScore : m_pUsers[i]->m_lMoney;
-//			}
-//			else if( iScoreType == SCORE_MATCH )
-//			{
-//				LostMoney[i] = 2 * iFinallyScore;
-//			}
-//		}
-//		else
-//		{
-//			if( iScoreType == SCORE_BEAN )
-//			{
-//				LostMoney[i] = m_pUsers[i]->m_lHappyBean >= iFinallyScore ? iFinallyScore : m_pUsers[i]->m_lHappyBean;
-//			}
-//			else if( iScoreType == SCORE_GOLD )
-//			{
-//				LostMoney[i] = m_pUsers[i]->m_lMoney >=  iFinallyScore ? iFinallyScore : m_pUsers[i]->m_lMoney;
-//			}
-//			else if( iScoreType == SCORE_MATCH )
-//			{
-//				LostMoney[i] = iFinallyScore ;
-//			}
-//		}
-//	}
-//
-//
-//	PT_DDZ_BALANCE_INFO data;
-//	data.iMultiple = (int)pow( 2, iNumOfBombPlusRocketPlusChunTian );
-//	data.iScoreType = iScoreType;
-//	data.iTax = (int)( dTax * 100 );
-//	data.wBombNum = m_iNumOfBomb;
-//	data.wRocketNum = m_iNumOfRocket;
-//	data.wSpriteNum = m_iChunTianOrFanChun;
-//	if( bIsDiZhu )
-//		data.bWin = true;//表示地主ＷＩＮ
-//	else
-//		data.bWin = false;
-//	for( int i = 0; i < 3; i++ )
-//	{
-//		if( m_UserInfo[i].m_bIsDiZhu )
-//		{
-//			if( bIsDiZhu )
-//			{
-//				for( int j = 0; j < 3; j ++ )
-//				{
-//					if( i == j )
-//						continue;
-//
-//					m_UserInfo[i].m_dCountScore += LostMoney[j];
-//				}
-//				m_UserInfo[i].m_dCountScore *= ( 1 - dTax );
+
+	double dTax = 10 / 100.0;//税率
+	int iScoreType = 1;
+
+	unsigned long long iDiZhuMoney = 0;
+	unsigned long long iNongMinMoney = 0;
+
+	unsigned long long LostMoney[3];
+
+	int iFinallyScore = m_iCurJiaoFen * (int)pow( 2, iNumOfBombPlusRocketPlusChunTian ) * iBaseScore;
+	for( int i = 0; i < 3; i++ )
+	{
+		m_UserInfo[i].m_dCountScore = 0;
+		if( m_UserInfo[i].m_bIsDiZhu )
+		{
+			if( iScoreType == SCORE_BEAN )
+			{
+				LostMoney[i] = m_pUsers[i]->m_lHappyBean >=  2 * iFinallyScore ? 2 * iFinallyScore : m_pUsers[i]->m_lHappyBean;
+			}
+			else if( iScoreType == SCORE_GOLD )
+			{
+				LostMoney[i] = m_pUsers[i]->m_lMoney >=  2 * iFinallyScore ? 2 * iFinallyScore : m_pUsers[i]->m_lMoney;
+			}
+			else if( iScoreType == SCORE_MATCH )
+			{
+				LostMoney[i] = 2 * iFinallyScore;
+			}
+		}
+		else
+		{
+			if( iScoreType == SCORE_BEAN )
+			{
+				LostMoney[i] = m_pUsers[i]->m_lHappyBean >= iFinallyScore ? iFinallyScore : m_pUsers[i]->m_lHappyBean;
+			}
+			else if( iScoreType == SCORE_GOLD )
+			{
+				LostMoney[i] = m_pUsers[i]->m_lMoney >=  iFinallyScore ? iFinallyScore : m_pUsers[i]->m_lMoney;
+			}
+			else if( iScoreType == SCORE_MATCH )
+			{
+				LostMoney[i] = iFinallyScore ;
+			}
+		}
+	}
 //
 //
+	PT_DDZ_BALANCE_INFO data;
+	data.nMultiple = (int)pow( 2, iNumOfBombPlusRocketPlusChunTian );
+	data.nScoreType = iScoreType;
+	data.nTax = (int)( dTax * 100 );
+	data.nBombNum = m_iNumOfBomb;
+	data.nRocketNum = m_iNumOfRocket;
+	data.nSpriteNum = m_iChunTianOrFanChun;
+	if( bIsDiZhu )
+		data.bWin = true;//表示地主ＷＩＮ
+	else
+		data.bWin = false;
+	for( int i = 0; i < 3; i++ )
+	{
+		if( m_UserInfo[i].m_bIsDiZhu )
+		{
+			if( bIsDiZhu )
+			{
+				for( int j = 0; j < 3; j ++ )
+				{
+					if( i == j )
+						continue;
+
+					m_UserInfo[i].m_dCountScore += LostMoney[j];
+				}
+				m_UserInfo[i].m_dCountScore *= ( 1 - dTax );
+
+
 //				if( m_pRoom->GetScoreType() == SCORE_GOLD )
 //					Bouns( m_UserInfo[i].m_dCountScore * ( dTax ));
 //
@@ -601,34 +601,34 @@ void CDDZGame::WinBalance( bool bIsDiZhu )
 //					m_pUsers[i]->m_iWin++;
 //					m_pUsers[i]->m_iScore += 2 * m_iCurJiaoFen* (int)pow( 2, iNumOfBombPlusRocketPlusChunTian ) * iBaseScore;
 //				}
-//			}
-//			else
-//			{
-//				m_UserInfo[i].m_dCountScore = -LostMoney[i];
-//
+			}
+			else
+			{
+				m_UserInfo[i].m_dCountScore = -LostMoney[i];
+
 //				if( m_pRoom->GetScoreType() != SCORE_MATCH )
 //				{
 //					m_pUsers[i]->m_iLost++;
 //					m_pUsers[i]->m_iScore += 2 * m_iCurJiaoFen* (int)pow( 2, iNumOfBombPlusRocketPlusChunTian  ) * -1 * iBaseScore;
 //				}
-//			}
-//		}
-//		else
-//		{
-//			if( !bIsDiZhu )
-//			{
-//				for( int j = 0; j < 3; j++ )
-//				{
-//					if( m_UserInfo[j].m_bIsDiZhu )
-//					{
-//						m_UserInfo[i].m_dCountScore = LostMoney[j] / 2;
-//						break;
-//					}
-//				}
-//
-//				m_UserInfo[i].m_dCountScore *= ( 1 - dTax );
-//
-//
+			}
+		}
+		else
+		{
+			if( !bIsDiZhu )
+			{
+				for( int j = 0; j < 3; j++ )
+				{
+					if( m_UserInfo[j].m_bIsDiZhu )
+					{
+						m_UserInfo[i].m_dCountScore = LostMoney[j] / 2;
+						break;
+					}
+				}
+
+				m_UserInfo[i].m_dCountScore *= ( 1 - dTax );
+
+
 //				//将税金放入奖池
 //				if( m_pRoom->GetScoreType() == SCORE_GOLD )
 //					Bouns( m_UserInfo[i].m_dCountScore * ( dTax ));
@@ -638,49 +638,48 @@ void CDDZGame::WinBalance( bool bIsDiZhu )
 //					m_pUsers[i]->m_iWin++;
 //					m_pUsers[i]->m_iScore += (int)pow( 2, iNumOfBombPlusRocketPlusChunTian ) * m_iCurJiaoFen* iBaseScore;
 //				}
-//			}
-//			else
-//			{
-//				m_UserInfo[i].m_dCountScore = -LostMoney[i];
-//
+			}
+			else
+			{
+				m_UserInfo[i].m_dCountScore = -LostMoney[i];
+
 //				if( m_pRoom->GetScoreType() != SCORE_MATCH )
 //				{
 //					m_pUsers[i]->m_iLost++;
 //					m_pUsers[i]->m_iScore += (int)pow( 2, iNumOfBombPlusRocketPlusChunTian ) * m_iCurJiaoFen* -1 * iBaseScore;
 //				}
-//			}
-//		}
-//
-//		data.iScore[i] = int( m_UserInfo[i].m_dCountScore > 0 ?  m_UserInfo[i].m_dCountScore + 0.5 : m_UserInfo[i].m_dCountScore );
-//		if( iScoreType == SCORE_BEAN )
-//		{
-//			m_pUsers[i]->m_lHappyBean += data.iScore[i];
-//
-//			if( m_pUsers[i]->m_lHappyBean < 0 )
-//				m_pUsers[i]->m_lHappyBean = 0;
-//
-//		}
-//		else if( iScoreType == SCORE_GOLD )
-//		{
-//			m_pUsers[i]->m_lMoney += data.iScore[i];
-//
-//			if( m_pUsers[i]->m_lMoney < 0 )
-//				m_pUsers[i]->m_lMoney = 0;
-//
-//		}
-//		else if( iScoreType == SCORE_MATCH )
-//		{
-//			m_pUsers[i]->m_iMatchScore += data.iScore[i];
-//
-//			/*if( m_pUsers[i]->m_iMatchScore < 0 )
-//				m_pUsers[i]->m_iMatchScore = 0;*/
-//		}
-//
-//		data.wNum[i] = m_UserInfo[i].m_wPaiNum;
-//		memcpy( data.wPai[i], m_UserInfo[i].m_wPai, sizeof(int) * m_UserInfo[i].m_wPaiNum );
-//	}
-//
-//	SendToAllUser( &data, sizeof(data) );
+			}
+		}
+
+		data.nScore[i] = int( m_UserInfo[i].m_dCountScore > 0 ?  m_UserInfo[i].m_dCountScore + 0.5 : m_UserInfo[i].m_dCountScore );
+		if( iScoreType == SCORE_BEAN )
+		{
+			m_pUsers[i]->m_lHappyBean += data.nScore[i];
+
+			if( m_pUsers[i]->m_lHappyBean < 0 )
+				m_pUsers[i]->m_lHappyBean = 0;
+
+		}
+		else if( iScoreType == SCORE_GOLD )
+		{
+			m_pUsers[i]->m_lMoney += data.nScore[i];
+
+			if( m_pUsers[i]->m_lMoney < 0 )
+				m_pUsers[i]->m_lMoney = 0;
+
+		}
+		else if( iScoreType == SCORE_MATCH )
+		{
+			m_pUsers[i]->m_iMatchScore += data.nScore[i];
+
+			/*if( m_pUsers[i]->m_iMatchScore < 0 )
+				m_pUsers[i]->m_iMatchScore = 0;*/
+		}
+
+
+	}
+
+	this->SendtoAll((char *)&data, sizeof(data) );
 
 }
 bool CDDZGame::HaveTheCard( CPlayer * pUser, int pai )
@@ -1026,16 +1025,16 @@ int CDDZGame::_IsPlaneSingle( SDDZPai pai[], int num )
 		return -1;
 
 	// 检测连牌是否全为３张,并且是否连续
-	//int iPaiValue = pai[iBegin].value;
-	//for( int i = iBegin + 3; i < iLian * 3 + iBegin; i += 3 )
-	//{
-	//	if( GetCardCountByCardNum( pai, num, pai[i].num ) != 3 )
-	//		return -1;
-	//	if( iPaiValue + 1 != pai[i].value )
-	//		return -1;
-	//	else
-	//		iPaiValue++;
-	//}
+	int iPaiValue = pai[iBegin].value;
+	for( int i = iBegin + 3; i < iLian * 3 + iBegin; i += 3 )
+	{
+		if( GetCardCountByCardNum( pai, num, pai[i].num ) != 3 )
+			return -1;
+		if( iPaiValue + 1 != pai[i].value )
+			return -1;
+		else
+			iPaiValue++;
+	}
 
 	for( int i = iBegin; i < iBegin + iLian * 3; i++ )
 	{
@@ -1198,13 +1197,13 @@ void CDDZGame::SortCard( SDDZPai Card[], int num )
 }
 void CDDZGame::MoveCurPointer()
 {
-	m_dwCurUser++;
-	if( m_dwCurUser == 3 )
-		m_dwCurUser = 0;
+	m_nCurUser++;
+	if( m_nCurUser == 3 )
+		m_nCurUser = 0;
 }
 void CDDZGame::JiaoPai(CPlayer *pUser, int num)
 {
-	if( m_bHasDiZhu || pUser->m_iChairId != m_dwCurUser )
+	if( m_bHasDiZhu || pUser->m_iChairId != m_nCurUser )
 		return;
 	if( num <= m_iCurJiaoFen && num != 0 && m_iCurJiaoFen != -1)
 		return;
@@ -1236,7 +1235,7 @@ void CDDZGame::JiaoPai(CPlayer *pUser, int num)
 	{
 		if( m_UserInfo[i].m_iJiaoFen == -1 )//有没叫分的玩家
 		{
-			if (!m_pUsers[m_dwCurUser]->m_bDrop) {
+			if (!m_pUsers[m_nCurUser]->m_bDrop) {
 				SET_TIMER_ONCE(WAIT_DDZ_JIAOFEN);
 			} else {
 				SET_TIMER_ONCE(WAIT_DDZ_JIAOFEN_OFFLINE);
@@ -1295,14 +1294,14 @@ void CDDZGame::SetDiZhu(CPlayer * pUser, int num) {
 	this->SendtoAll((char *)&data1, sizeof( data1 ));
 
 
-	m_dwCurUser = pUser->m_iChairId;
+	m_nCurUser = pUser->m_iChairId;
 
 	memcpy(&m_UserInfo[pUser->m_iChairId].m_wPai[17], &m_iDiPai,
 			sizeof(int) * 3);
 
 	m_UserInfo[pUser->m_iChairId].m_wPaiNum = 20;
 
-	if (m_pUsers[m_dwCurUser]->m_bDrop) {
+	if (m_pUsers[m_nCurUser]->m_bDrop) {
 		SET_TIMER_ONCE(WAIT_DDZ_DAPAI_OFFLINE);
 	} else {
 		SET_TIMER_ONCE(WAIT_DDZ_DAPAI);
