@@ -381,6 +381,40 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 	unsigned int nHostMsgId;
 	readPaket.Read(nHostMsgId);
 	switch (nHostMsgId) {
+	case PT_MJ_MATCH_ACCEPT: {
+		unsigned int uid;
+		unsigned int nIndex;
+
+		unsigned int num;
+
+		PT_MJ_MATCH_ACCEPT_INFO * msg = (PT_MJ_MATCH_ACCEPT_INFO *)packet->data;
+
+
+		readPaket.Read(num);
+
+		for (int i = 0; i < num; i++) {
+			readPaket.Read(uid);
+			readPaket.Read(nIndex);
+
+			if (nIndex < 0 || nIndex > 3) {
+				assert(0);
+			}
+
+			m_mjuser[nIndex].nIndex = nIndex;
+			m_mjuser[nIndex].nUserId = uid;
+
+			printf("match uid is %d, nIndex:%d\n", uid, nIndex);
+			if (uid == m_nUserId) {
+				m_nIndex = nIndex;
+			}
+
+		}
+
+		printf("=============================\n");
+
+		SetTimer(ON_READY, ON_READY_TIME);
+	}
+		return true;
 
 	case PT_DDZ_CHUPAI: {
 
@@ -552,47 +586,9 @@ bool CUser::Run() {
 			}
 			m_HostList.clear();
 
-
 		}
 			break;
 
-		case PT_CHANGE_HOST: {
-
-			printf("myself:%d, PT_CHANGE_HOST\n");
-
-			//	PT_CHANGE_HOST_INFO * msg = (PT_CHANGE_HOST_INFO *)packet->data;
-
-			unsigned int nHostId;
-			unsigned int nOldHostId;
-			RakNet::BitStream readPaket(packet->data, packet->length, false);
-			readPaket.IgnoreBytes(1);
-			readPaket.Read(nHostId);
-			readPaket.Read(nOldHostId);
-//			nHostId = msg->nHostId;
-//			nOldHostId = msg->nOldHostId;
-
-			printf("myself:%d, oldhostid:%d,newhostid:%d,PT_CHANGE_HOST\n",
-					m_nUserId, nOldHostId, nHostId);
-
-			if (m_HostList.find(nOldHostId) == m_HostList.end())
-				assert(false);
-
-			m_HostList[nHostId] = m_HostList[nOldHostId];
-			m_HostList[nHostId]->nHostId = nHostId;
-			m_HostList.erase(nOldHostId);
-
-			if (m_pHost && m_pHost->nHostId == nOldHostId) {
-				m_pHost->nHostId = nHostId;
-			}
-		}
-			break;
-
-
-		case PT_USER_INGAME_MSG: {
-			printf("myself:%d,PT_USER_INGAME_MSG\n", m_nUserId);
-
-		}
-			break;
 		default: {
 			printf("unknow msg id %d\n", packetIdentifier);
 		}
