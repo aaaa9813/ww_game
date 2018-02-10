@@ -338,8 +338,8 @@ struct PT_DDZ_GAME_START_INFO {
 
 	int pai[17];
 
-	//地方的玩家ID
-	int dizhuId;
+	//谁先叫分玩家ID
+	int nActUid;
 
 	PT_DDZ_GAME_START_INFO() :
 

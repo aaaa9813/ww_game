@@ -15,7 +15,9 @@
 #include "CServer.h"
 CDDZGame::CDDZGame() {
 	// TODO Auto-generated constructor stub
+	m_pUsers = new CBaseUser *[3];
 
+	memset(m_pUsers, 0, sizeof(CBaseUser *) * 3);
 	for (int i = 0; i < 54; ++i)
 		m_iPai[i] = i;
 	//m_wPai[i] = 13 * (i % 4) + i / 4;
@@ -51,13 +53,18 @@ void CDDZGame::Reset() {
 	m_bHasDiZhu = false;
 
 	//random
-	int num = rand() % 3;
+	int num = GetActIndex();
 	m_dwCurUser = num;
+
+	if(m_pUsers[m_dwCurUser])
+	m_nActUid = m_pUsers[m_dwCurUser]->GetId();
 
 	m_bInGame = true;
 
 	//洗牌
 	Shuffle();
+
+
 
 }
 
@@ -177,6 +184,12 @@ void CDDZGame::Shuffle() {
 	m_iChuPaiUser = -1;
 }
 
+int CDDZGame::GetActIndex()
+{
+	int index = rand() % 3;
+
+	return index;
+}
 void CDDZGame::StartGame() {
 	//CBaseTable::StartGame();
 
@@ -188,6 +201,9 @@ void CDDZGame::StartGame() {
 
 	//玩家数据初始化
 	for (int i = 0; i < 3; ++i) {
+		if(!m_pUsers[i])
+			continue;
+
 		m_pUsers[i]->m_iState = US_INGAME;
 
 		memcpy(m_UserInfo[i].m_wPai, &m_iPai[m_iNext], sizeof(int) * 17);
@@ -206,7 +222,7 @@ void CDDZGame::StartGame() {
 	for (int i = 0; i < 3; i++) {
 
 		PT_DDZ_GAME_START_INFO data;
-
+		data.nActUid = m_nActUid;
 		memcpy(data.dipai, m_iDiPai, sizeof(int) * 3);
 		memcpy(data.pai, m_UserInfo[i].m_wPai, sizeof(int) * 17);
 
@@ -258,8 +274,10 @@ bool CDDZGame::EnterGame(unsigned int uid, unsigned int &nIndex) {
 		m_Userlist[uid] = pUser;
 		nIndex = AllocIndex(uid);
 
+		assert(nIndex>=0 && nIndex < 3);
 		m_UserInfo[nIndex].Uid = uid;
 
+		m_pUsers[nIndex] = pUser;
 		if (nIndex == -1) {
 			return false;
 		}

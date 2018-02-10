@@ -143,6 +143,8 @@ protected:
 	void WinBalance( bool bIsDiZhu );
 	void EndGame();
 	void ResetTablePai();
+
+	int GetActIndex();
 public:
 
 	CBaseUser ** m_pUsers;
@@ -174,7 +176,6 @@ public:
 
 
 protected:
-	unsigned int m_dwId;
 
 	unsigned int m_dwCurUser;									//当前活动玩家
 
@@ -184,6 +185,7 @@ protected:
 
 	int m_iBout;										//第几局
 
+	int m_nActUid;
 };
 extern SDDZPai g_DDZPaiInfo[54];
 extern SDDZPai * GetDDZPaiInfo(int wId);
