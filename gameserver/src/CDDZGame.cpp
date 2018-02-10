@@ -221,7 +221,8 @@ void CDDZGame::StartGame() {
 	m_iNext += 3;
 
 	for (int i = 0; i < 3; i++) {
-
+		if(!m_pUsers[i])
+			continue;
 		PT_DDZ_GAME_START_INFO data;
 		data.nActUid = m_nActUid;
 		memcpy(data.dipai, m_iDiPai, sizeof(int) * 3);
