@@ -87,13 +87,16 @@ public:
 	;
 
 public:
+
 	void ChuPai(CPlayer * pUser, int pai[], int len);
+
 	void PassPai(CPlayer * pUser);
+
 	void JiaoPai(CPlayer * pUser, int num);
 
 	void StartGame();
-	void SetDiZhu(CPlayer * pUser, int num);
 
+	void SetDiZhu(CPlayer * pUser, int num);
 
 
 protected:
@@ -177,11 +180,12 @@ public:
 
 protected:
 
-	unsigned int m_dwCurUser;									//当前活动玩家
 
-	unsigned int m_dwTime;										//记时
+	unsigned int m_nCurUser;									//当前活动玩家
 
-	CBaseRoom * m_pRoom;										//属于哪个房间
+	unsigned int m_nTime;										//记时
+
+//	CBaseRoom * m_pRoom;										//属于哪个房间
 
 	int m_iBout;										//第几局
 

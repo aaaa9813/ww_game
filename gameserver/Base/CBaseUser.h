@@ -39,5 +39,10 @@ class CBaseUser:public CBase
 		}
 
 		unsigned int m_iState;
+
+		unsigned long long m_lHappyBean;
+		unsigned long long m_lMoney;
+
+		unsigned int m_iMatchScore;
 };
 #endif

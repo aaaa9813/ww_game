@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>gameserver</name>
+	<name>robot_mj</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -24,16 +24,4 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>include/packdefine.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/common/packdefine.h</locationURI>
-		</link>
-		<link>
-			<name>include/structdefine.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/common/structdefine.h</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>

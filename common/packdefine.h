@@ -235,7 +235,11 @@ enum HOSTMSG {
 
 	PT_DDZ_GAME_START,
 	PT_DDZ_DZPAI,
+
 	PT_DDZ_USER_JIAOPAI,
+	PT_DDZ_GAME_END,
+
+	PT_DDZ_BALANCE,
 };
 enum OPT_TYPE {
 	OPT_TYPE_DAPAI = 0, OPT_TYPE_GANG, OPT_TYPE_PENG, OPT_TYPE_MOPAI,
@@ -360,7 +364,55 @@ struct PT_DDZ_DZPAI_INFO {
 			id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_DZPAI) {
 	}
 };
+struct PT_DDZ_GAME_END_INFO {
+	unsigned char id;
 
+	int nMsgid;
+
+	int nGameId;
+	int nPaiNum[3];
+	int nPai[3];
+
+	PT_DDZ_GAME_END_INFO() :
+
+			id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_GAME_END) {
+	}
+};
+
+struct PT_DDZ_BALANCE_INFO {
+	unsigned char id;
+
+	int nMsgid;
+
+	unsigned int nMultiple;
+	unsigned int nScoreType;
+	unsigned int nTax;
+	unsigned int nBombNum;
+	unsigned int nRocketNum;
+	unsigned int nSpriteNum;
+
+	unsigned int nScore[3];
+	bool bWin;
+
+	PT_DDZ_BALANCE_INFO() :
+
+			id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_BALANCE) {
+	}
+};
+
+struct PT_DDZ_USER_CHUPAI_INFO {
+	unsigned char id;
+
+	int nMsgid;
+
+	unsigned int nUid;
+	unsigned int nNum;
+	unsigned int nPai[20];
+
+	PT_DDZ_USER_CHUPAI_INFO() :
+			id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_USER_CHUPAI) {
+	}
+};
 struct SUserIndexInfo {
 	unsigned int uid;
 	unsigned int index;
