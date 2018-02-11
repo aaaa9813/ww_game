@@ -8,8 +8,8 @@ class CBaseUser:public CBase
 		~CBaseUser();
 
 
-	private:
-		unsigned int m_nIndex;
+	public:
+		unsigned int m_iChairId;
 
 		bool		 m_bReady;
 
@@ -20,12 +20,12 @@ class CBaseUser:public CBase
 
 		unsigned int GetIndex()
 		{
-			return m_nIndex;
+			return m_iChairId;
 		}
 
 		void SetIndex(unsigned int index)
 		{
-			m_nIndex = index;
+			m_iChairId = index;
 		}
 
 		bool GetReady()

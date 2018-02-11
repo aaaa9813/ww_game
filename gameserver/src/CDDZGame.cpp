@@ -271,8 +271,15 @@ bool CDDZGame::Net_Ready(unsigned int uid) {
 
 bool CDDZGame::EnterGame(unsigned int uid, unsigned int &nIndex) {
 	if (m_Userlist.find(uid) == m_Userlist.end()) {
-		CBaseUser * pUser = new CBaseUser();
-		pUser->SetId(uid);
+		if(g_Server.m_UListByUid.find(uid) == g_Server.m_UListByUid.end())
+		{
+			return false;
+		}
+
+		CPlayer * pUser = g_Server.m_UListByUid[uid];
+
+	//	CBaseUser * pUser = new CBaseUser();
+	//	pUser->SetId(uid);
 		m_Userlist[uid] = pUser;
 		nIndex = AllocIndex(uid);
 

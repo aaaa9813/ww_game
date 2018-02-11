@@ -31,14 +31,6 @@ struct PT_ENTER_GAME_REQUEST_INFO_EX
 };
 
 
-struct PT_ENTER_GAME_REQUEST_INFO_EX1
-{
-	int serverid;
-	int gameid;
-	int uid;
-	unsigned long long guid;
-
-};
 
 #pragma pack(pop)
 //class CPeer;

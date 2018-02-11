@@ -10,6 +10,7 @@
 #include "GetTime.h"
 #include "Kbhit.h"
 #include "Gets.h"
+#include "packdefine.h"
 CNetApp g_NetApp;
 CNetApp::CNetApp() {
 	// TODO Auto-generated constructor stub
@@ -170,18 +171,33 @@ void CUser::SendData(BitStream * bitStream, SystemAddress addr) {
 }
 
 //==========================================================================
-void CUser::SendLaZhuang(unsigned int ZhuangNum) {
+void CUser::SendJiaoFen(unsigned int fennum) {
 	RakNet::BitStream bsData;
 	bsData.Write((unsigned char) PT_HOST_MESSAGE);
-	bsData.Write((unsigned int) PT_MJ_LAZHUANG_REQ);
-	bsData.Write((unsigned int) ZhuangNum);
+	bsData.Write((unsigned int) PT_DDZ_JIAOFEN);
+
+	PT_DDZ_JIAOFEN_INFO data;
+	data.nFen = fennum;
+	bsData.Write((char *)&data, sizeof(data));
 	SendData(&bsData, m_ServerAddr);
 }
-void CUser::SendZuoZhuang(unsigned int zhuangNum) {
+
+
+
+
+
+void CUser::SendChuPai(	) {
 	RakNet::BitStream bsData;
 	bsData.Write((unsigned char) PT_HOST_MESSAGE);
-	bsData.Write((unsigned int) PT_MJ_ZHUOZHUANG_REQ);
-	bsData.Write((unsigned int) zhuangNum);
+	bsData.Write((unsigned int) PT_DDZ_CHUPAI);
+
+	PT_DDZ_CHUPAI_INFO data;
+	data.uid = this->m_nUserId;
+	data.painum = 1;
+	data.pai[0] = 2;
+
+
+	bsData.Write((char *)&data, sizeof(data));
 	SendData(&bsData, m_ServerAddr);
 }
 
@@ -241,10 +257,18 @@ void CUser::SendEntergame(unsigned serverid, unsigned int gameid,
 		unsigned int uid) {
 	RakNet::BitStream ws;
 	ws.Write((unsigned char) PT_ENTER_GAME_REQUEST);
-	ws.Write((unsigned int) serverid);
-	ws.Write((unsigned int) gameid);
-	ws.Write((unsigned int) uid);
-	ws.Write((unsigned long long) 0);
+
+	PT_ENTER_GAME_REQUEST_INFO_EX1 data;
+	data.serverid = serverid;
+	data.gameid = gameid;
+	data.uid = uid;
+
+	ws.Write((char *)&data, sizeof(data));
+
+//	ws.Write((unsigned int) serverid);
+//	ws.Write((unsigned int) gameid);
+//	ws.Write((unsigned int) uid);
+//	ws.Write((unsigned long long) 0);
 	SendData(&ws, m_ServerAddr);
 }
 //==========================================================================================
@@ -306,13 +330,8 @@ void CUser::OnTimer(int iTimerID) {
 		break;
 
 	case ON_JIAO_FEN: {
+		SendJiaoFen(3);
 
-		int zhuang = rand() % 3 + 1;
-
-		SendZuoZhuang(zhuang);
-
-		printf("ontime===ON_ZHUOZHUANG===uid:%d, zhuang:%d\n", m_nUserId,
-				zhuang);
 
 	}
 		break;
@@ -323,7 +342,7 @@ void CUser::OnTimer(int iTimerID) {
 //		bsData.Write((unsigned int) 1);
 //		SendData(&bsData, m_ServerAddr);
 
-		SendLaZhuang(1);
+		SendChuPai();
 	}
 		break;
 
@@ -375,36 +394,29 @@ bool CUser::ProHostMsg(Packet * packet) {
 }
 
 bool CUser::ProHostMsgByStream(Packet * packet) {
-	RakNet::BitStream readPaket(packet->data, packet->length, false);
-	readPaket.IgnoreBytes(1);
 
-	unsigned int nHostMsgId;
-	readPaket.Read(nHostMsgId);
-	switch (nHostMsgId) {
-	case PT_MJ_MATCH_ACCEPT: {
+	unsigned int msgid = *((unsigned int *) (packet->data + 1));
+
+	switch (msgid) {
+	case PT_DDZ_MATCH_ACCEPT: {
 		unsigned int uid;
 		unsigned int nIndex;
 
 		unsigned int num;
 
-		PT_MJ_MATCH_ACCEPT_INFO * msg = (PT_MJ_MATCH_ACCEPT_INFO *)packet->data;
+		PT_DDZ_MATCH_ACCEPT_INFO * msg = (PT_DDZ_MATCH_ACCEPT_INFO *)packet->data;
 
-
-		readPaket.Read(num);
-
+		num = msg->usernum;
 		for (int i = 0; i < num; i++) {
-			readPaket.Read(uid);
-			readPaket.Read(nIndex);
 
-			if (nIndex < 0 || nIndex > 3) {
-				assert(0);
-			}
+			int nIndex = msg->userindex[i].index;
+			int nUid = msg->userindex[i].uid;
 
 			m_mjuser[nIndex].nIndex = nIndex;
-			m_mjuser[nIndex].nUserId = uid;
+			m_mjuser[nIndex].nUserId = nUid;
 
-			printf("match uid is %d, nIndex:%d\n", uid, nIndex);
-			if (uid == m_nUserId) {
+
+			if (msg->userindex[i].uid == m_nUserId) {
 				m_nIndex = nIndex;
 			}
 
@@ -444,6 +456,12 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 
 	case PT_DDZ_GAME_START: {
 
+		PT_DDZ_GAME_START_INFO * msg = (PT_DDZ_GAME_START_INFO *)packet->data;
+
+		if(msg->nActUid == this->m_nUserId)
+		{
+			SetTimer(ON_JIAO_FEN, ON_JIAO_FEN_TIME);
+		}
 	}
 		break;
 	case PT_DDZ_DZPAI: {
@@ -514,7 +532,7 @@ bool CUser::Run() {
 
 			m_ServerAddr = packet->systemAddress;
 
-			SetTimer(ON_ENTER_GAME_TIME, 1000 + random() % 1000);
+			SetTimer(ON_ENTER_GAME, ON_ENTER_GAME_TIME);
 
 			SetTimer(ON_HEART_JUMP, ON_HEART_JUMP_TIME, false);
 

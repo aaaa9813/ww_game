@@ -132,8 +132,8 @@ public:
 
 	void SendData(BitStream * bitStream, SystemAddress addr);
 
-	void SendLaZhuang(unsigned int ZhuangNum);
-	void SendZuoZhuang(unsigned int ZhuangNum);
+	void SendJiaoFen(unsigned int ZhuangNum);
+	void SendChuPai();
 	void SendDasaizi();
 	void SendDasaiziag();
 	void SendEntergame(unsigned serverid, unsigned int gameid, unsigned int uid);
@@ -172,7 +172,7 @@ public:
 
 public:
 
-	SMJUser m_mjuser[4];
+	SMJUser m_mjuser[3];
 	unsigned int m_nUserId;
 	unsigned int m_nIndex;
 

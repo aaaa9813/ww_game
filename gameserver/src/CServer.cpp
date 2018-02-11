@@ -413,6 +413,7 @@ void CServer::HandlePacketCmd() {
 				pPlayer = new CPlayer;
 				pPlayer->SetId(nUserId);
 				pPlayer->m_Guid = packet->guid;
+				pPlayer->m_nGameId = nGameId;
 				m_UListByUid[nUserId] = pPlayer;
 
 				PT_ENTER_GAME_ACCEPT_INFO data;
@@ -598,14 +599,18 @@ bool CServer::ProHostMsgByStream(CPlayer * pUser, unsigned char * data,
 
 	case PT_DDZ_CHUPAI: {
 
-		int pai[20];
-		int painum = 0;
-		((CDDZGame *)pGame)->ChuPai(pUser, pai, painum);
+		PT_DDZ_CHUPAI_INFO * msg = (PT_DDZ_CHUPAI_INFO *)data;
+
+
+		((CDDZGame *)pGame)->ChuPai(pUser, msg->pai, msg->painum);
 	}
 		return true;
 	case PT_DDZ_JIAOFEN: {
 
-		int fen = 1;
+		PT_DDZ_JIAOFEN_INFO * msg = (PT_DDZ_JIAOFEN_INFO *)data;
+
+		int fen = msg->nFen;
+
 		((CDDZGame *)pGame)->JiaoPai(pUser, fen);
 	}
 		return true;
@@ -1128,7 +1133,7 @@ void CServer::OnTimeMatch() {
 	///匹配已有游戏
 
 	//游戏人数
-	const int gameusernum = 1;
+	const int gameusernum = 3;
 
 	CPlayer * tmp[gameusernum];
 	memset(tmp, 0, sizeof(CPlayer *) * gameusernum);
@@ -1167,7 +1172,7 @@ void CServer::OnTimeMatch() {
 			return;
 		}
 
-		PT_MJ_MATCH_ACCEPT_INFO data;
+		PT_DDZ_MATCH_ACCEPT_INFO data;
 		data.serverid=0;
 		data.gameid=0;
 
