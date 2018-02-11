@@ -324,6 +324,8 @@ struct PT_DDZ_USER_JIAOPAI_INFO {
 
 	unsigned int nUid;
 	unsigned int nNum;
+
+	unsigned int nActUid;
 	PT_DDZ_USER_JIAOPAI_INFO() :
 
 			id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_USER_JIAOPAI) {
@@ -337,6 +339,8 @@ struct PT_DDZ_USER_PASS_INFO {
 
 	unsigned int nUid;
 
+	unsigned int nActUid;
+
 	PT_DDZ_USER_PASS_INFO() :
 
 			id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_USER_PASS) {
@@ -344,14 +348,33 @@ struct PT_DDZ_USER_PASS_INFO {
 };
 
 struct PT_DDZ_CHUPAI_INFO {
-	unsigned int uid;
-	int painum;
-	int pai[20];
 
+	unsigned char id;
+
+	int nMsgid;
+
+	unsigned int uid;
+	unsigned int painum;
+	unsigned int pai[20];
+
+	PT_DDZ_CHUPAI_INFO() :
+
+			id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_CHUPAI) {
+	}
 };
 
 struct PT_DDZ_JIAOFEN_INFO {
+
+	unsigned char id;
+
+	unsigned int nMsgid;
+
 	unsigned int nFen;
+
+	PT_DDZ_JIAOFEN_INFO() :
+
+			id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_JIAOFEN) {
+	}
 };
 struct PT_DDZ_GAME_START_INFO {
 
@@ -379,7 +402,7 @@ struct PT_DDZ_DZPAI_INFO {
 	int wPai[3];
 	int wScore;
 	unsigned int dwUserId;
-
+	unsigned int nActUid;
 	PT_DDZ_DZPAI_INFO() :
 
 			id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_DZPAI) {
@@ -430,6 +453,7 @@ struct PT_DDZ_USER_CHUPAI_INFO {
 	unsigned int nNum;
 	unsigned int nPai[20];
 
+	unsigned int nActUid;
 	PT_DDZ_USER_CHUPAI_INFO() :
 			id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_USER_CHUPAI) {
 	}

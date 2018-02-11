@@ -9,7 +9,7 @@ class CBaseUser:public CBase
 
 
 	public:
-		unsigned int m_iChairId;
+		int 		m_iChairId;
 
 		bool		 m_bReady;
 

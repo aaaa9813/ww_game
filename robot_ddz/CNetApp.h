@@ -170,6 +170,11 @@ public:
 
 	bool Run();
 
+	void GetChuPai(unsigned int pai[], unsigned int &num);
+
+	void SwapPai(int i, int j);
+
+	void CardSort();
 public:
 
 	SMJUser m_mjuser[3];
@@ -179,10 +184,12 @@ public:
 	unsigned int m_nBankIndex;
 	unsigned int m_nBankId;
 
-	unsigned int m_nCard[14];
-
+	unsigned int m_nCard[20];
+	unsigned int m_nCardNum;
 	CPeer * m_peer;
 
+
+	unsigned int m_nCurFen;
 	CTimer * m_pTimer;
 
 	SystemAddress m_ServerAddr;

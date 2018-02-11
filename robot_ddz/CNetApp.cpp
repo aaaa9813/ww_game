@@ -149,11 +149,16 @@ CUser::CUser() {
 		m_mjuser[i].nIndex = -1;
 		m_mjuser[i].nUserId = -1;
 	}
-	unsigned int m_nUserId = -1;
-	unsigned int m_nIndex = -1;
+	m_nUserId = -1;
+	m_nIndex = -1;
 
-	unsigned int m_nBankIndex = -1;
-	unsigned int m_nBankId = -1;
+	m_nBankIndex = -1;
+	m_nBankId = -1;
+
+	m_nCurFen = 0;
+
+	memset(m_nCard, 0, sizeof(unsigned int) * 20);
+	m_nCardNum = 0;
 }
 CUser::~CUser() {
 	delete m_peer;
@@ -178,26 +183,29 @@ void CUser::SendJiaoFen(unsigned int fennum) {
 
 	PT_DDZ_JIAOFEN_INFO data;
 	data.nFen = fennum;
-	bsData.Write((char *)&data, sizeof(data));
+	bsData.Write((char *) &data, sizeof(data));
 	SendData(&bsData, m_ServerAddr);
 }
 
+/**
+ *  根据桌面的牌，确定要出的牌
+ *  服务器出牌成功后，再更新手牌
+ */
+void CUser::GetChuPai(unsigned int pai[], unsigned int &num) {
+	pai[0] = m_nCard[0];
+	num = 1;
+}
 
-
-
-
-void CUser::SendChuPai(	) {
+void CUser::SendChuPai() {
 	RakNet::BitStream bsData;
 	bsData.Write((unsigned char) PT_HOST_MESSAGE);
 	bsData.Write((unsigned int) PT_DDZ_CHUPAI);
 
 	PT_DDZ_CHUPAI_INFO data;
 	data.uid = this->m_nUserId;
-	data.painum = 1;
-	data.pai[0] = 2;
+	GetChuPai(data.pai, data.painum);
 
-
-	bsData.Write((char *)&data, sizeof(data));
+	bsData.Write((char *) &data, sizeof(data));
 	SendData(&bsData, m_ServerAddr);
 }
 
@@ -263,7 +271,7 @@ void CUser::SendEntergame(unsigned serverid, unsigned int gameid,
 	data.gameid = gameid;
 	data.uid = uid;
 
-	ws.Write((char *)&data, sizeof(data));
+	ws.Write((char *) &data, sizeof(data));
 
 //	ws.Write((unsigned int) serverid);
 //	ws.Write((unsigned int) gameid);
@@ -330,17 +338,11 @@ void CUser::OnTimer(int iTimerID) {
 		break;
 
 	case ON_JIAO_FEN: {
-		SendJiaoFen(3);
-
+		SendJiaoFen((m_nCurFen + 1) % 3);
 
 	}
 		break;
 	case ON_CHU_PAI: {
-//		RakNet::BitStream bsData;
-//		bsData.Write((unsigned char) PT_HOST_MESSAGE);
-//		bsData.Write((unsigned int) PT_MJ_LAZHUANG_REQ);
-//		bsData.Write((unsigned int) 1);
-//		SendData(&bsData, m_ServerAddr);
 
 		SendChuPai();
 	}
@@ -393,6 +395,38 @@ bool CUser::ProHostMsg(Packet * packet) {
 	return false;
 }
 
+void CUser::SwapPai(int i, int j) {
+	m_nCard[j] ^= m_nCard[i];
+	m_nCard[i] ^= m_nCard[j];
+	m_nCard[j] ^= m_nCard[i];
+}
+/**
+ * 出过的牌由于被置为0，所以永远会在最后
+ */
+void CUser::CardSort() {
+	int k = 0;
+	for (int i = 0; i < m_nCardNum - 1; i++) {
+		k = i;
+		for (int j = i; j < m_nCardNum; j++) {
+			if (m_nCard[k] < m_nCard[j]) {
+				k = j;
+			}
+		}
+
+		if (k != i) {
+
+			SwapPai(k, i);
+		}
+	}
+
+	printf("==================================\nuid:%u", this->m_nUserId);
+	for (int i = 0; i < m_nCardNum; i++) {
+		printf("%u ", m_nCard[i]);
+
+	}
+	printf("==============================\n");
+}
+
 bool CUser::ProHostMsgByStream(Packet * packet) {
 
 	unsigned int msgid = *((unsigned int *) (packet->data + 1));
@@ -404,7 +438,8 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 
 		unsigned int num;
 
-		PT_DDZ_MATCH_ACCEPT_INFO * msg = (PT_DDZ_MATCH_ACCEPT_INFO *)packet->data;
+		PT_DDZ_MATCH_ACCEPT_INFO * msg =
+				(PT_DDZ_MATCH_ACCEPT_INFO *) packet->data;
 
 		num = msg->usernum;
 		for (int i = 0; i < num; i++) {
@@ -414,7 +449,6 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 
 			m_mjuser[nIndex].nIndex = nIndex;
 			m_mjuser[nIndex].nUserId = nUid;
-
 
 			if (msg->userindex[i].uid == m_nUserId) {
 				m_nIndex = nIndex;
@@ -427,6 +461,19 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 		SetTimer(ON_READY, ON_READY_TIME);
 	}
 		return true;
+
+	case PT_DDZ_DZPAI: {
+		PT_DDZ_DZPAI_INFO * msg = (PT_DDZ_DZPAI_INFO *) packet->data;
+
+		if (msg->dwUserId == this->m_nUserId) {
+			memcpy(&m_nCard[17], msg->wPai, sizeof(unsigned int) * 3);
+			m_nCardNum = 20;
+
+			CardSort();
+
+			SetTimer(ON_CHU_PAI, ON_CHU_PAI_TIME);
+		}
+	}
 
 	case PT_DDZ_CHUPAI: {
 
@@ -442,7 +489,32 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 		break;
 
 	case PT_DDZ_USER_CHUPAI: {
+		PT_DDZ_USER_CHUPAI_INFO * msg = (PT_DDZ_USER_CHUPAI_INFO *) packet->data;
 
+		//自己出的牌
+		if (msg->nUid == this->m_nUserId) {
+			//更新手牌
+			for (int i = 0; i < msg->nNum; i++) {
+				if (this->m_nCard[i] == msg->nPai[i]) {
+
+					//1,1,1,1,1,1,1,0,0,0,0,0
+					//与最后一张交换位置，使最后的牌都是用过的
+					SwapPai(i, this->m_nCardNum - 1);
+
+					this->m_nCardNum--;
+				}
+			}
+
+			CardSort();
+
+		} else {
+			//别人出的牌
+		}
+
+		//轮到自己出牌
+		if (msg->nActUid == this->m_nUserId) {
+			SetTimer(ON_CHU_PAI, ON_CHU_PAI_TIME);
+		}
 	}
 		break;
 	case PT_DDZ_USER_JIAOFEN: {
@@ -456,20 +528,36 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 
 	case PT_DDZ_GAME_START: {
 
-		PT_DDZ_GAME_START_INFO * msg = (PT_DDZ_GAME_START_INFO *)packet->data;
+		PT_DDZ_GAME_START_INFO * msg = (PT_DDZ_GAME_START_INFO *) packet->data;
 
-		if(msg->nActUid == this->m_nUserId)
-		{
+		memcpy(m_nCard, msg->pai, sizeof(signed int) * 17);
+		m_nCardNum = 17;
+
+		CardSort();
+
+		if (msg->nActUid == this->m_nUserId) {
 			SetTimer(ON_JIAO_FEN, ON_JIAO_FEN_TIME);
 		}
 	}
 		break;
-	case PT_DDZ_DZPAI: {
 
-	}
-		break;
 	case PT_DDZ_USER_JIAOPAI: {
 
+		PT_DDZ_USER_JIAOPAI_INFO * msg =
+				(PT_DDZ_USER_JIAOPAI_INFO *) packet->data;
+
+		m_nCurFen = msg->nNum;
+		if (msg->nActUid == this->m_nUserId) {
+			if (msg->nNum < 3) {
+
+				SetTimer(ON_JIAO_FEN, ON_JIAO_FEN_TIME);
+
+			} else {
+
+			}
+		}
+
+		int a = 0;
 	}
 		break;
 	case PT_DDZ_GAME_END: {

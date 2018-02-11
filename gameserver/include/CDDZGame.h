@@ -88,7 +88,7 @@ public:
 
 public:
 
-	void ChuPai(CPlayer * pUser, int pai[], int len);
+	void ChuPai(CPlayer * pUser, unsigned int pai[], unsigned int len);
 
 	void PassPai(CPlayer * pUser);
 
@@ -108,7 +108,7 @@ protected:
 
 	void SortCard(SDDZPai Card[], int num);
 	// 出牌检测
-	bool ChuPaiCheck(CPlayer * pUser, int pai[], int num);
+	bool ChuPaiCheck(CPlayer * pUser, unsigned int pai[], int num);
 	// 检测是否为火箭牌型
 	bool _IsRocket(SDDZPai pai[], int num);
 	// 检测是否为炸弹牌型
@@ -142,7 +142,7 @@ protected:
 
 	bool HaveTheCard(CPlayer * pUser, int pai);
 
-	void MoveAbandonCardToArrayLast( CPlayer * pUser, int AbandonPai[], int AbandonNum );
+	void MoveAbandonCardToArrayLast( CPlayer * pUser, unsigned int AbandonPai[], int AbandonNum );
 	void WinBalance( bool bIsDiZhu );
 	void EndGame();
 	void ResetTablePai();
