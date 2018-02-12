@@ -344,7 +344,13 @@ void CUser::OnTimer(int iTimerID) {
 		break;
 	case ON_CHU_PAI: {
 
-		SendChuPai();
+		if (m_nTableCardNum >= 1) {
+
+			SendChuPai();
+		} else {
+
+			SendChuPai();
+		}
 	}
 		break;
 
@@ -421,7 +427,7 @@ void CUser::CardSort() {
 
 	printf("==================================\nuid:%u", this->m_nUserId);
 	for (int i = 0; i < m_nCardNum; i++) {
-		printf("%u ", m_nCard[i]);
+		printf(",%u ", m_nCard[i]);
 
 	}
 	printf("==============================\n");
@@ -433,6 +439,9 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 
 	switch (msgid) {
 	case PT_DDZ_MATCH_ACCEPT: {
+
+		printf("PT_DDZ_MATCH_ACCEPT, uid:%u\n", this->m_nUserId);
+
 		unsigned int uid;
 		unsigned int nIndex;
 
@@ -463,6 +472,9 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 		return true;
 
 	case PT_DDZ_DZPAI: {
+
+		printf("PT_DDZ_DZPAI, uid:%u\n", this->m_nUserId);
+
 		PT_DDZ_DZPAI_INFO * msg = (PT_DDZ_DZPAI_INFO *) packet->data;
 
 		if (msg->dwUserId == this->m_nUserId) {
@@ -474,21 +486,12 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 			SetTimer(ON_CHU_PAI, ON_CHU_PAI_TIME);
 		}
 	}
-
-	case PT_DDZ_CHUPAI: {
-
-	}
-		break;
-	case PT_DDZ_JIAOFEN: {
-
-	}
-		break;
-	case PT_DDZ_PASS: {
-
-	}
 		break;
 
 	case PT_DDZ_USER_CHUPAI: {
+
+		printf("PT_DDZ_USER_CHUPAI, uid:%u\n", this->m_nUserId);
+
 		PT_DDZ_USER_CHUPAI_INFO * msg = (PT_DDZ_USER_CHUPAI_INFO *) packet->data;
 
 		//自己出的牌
@@ -518,16 +521,17 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 	}
 		break;
 	case PT_DDZ_USER_JIAOFEN: {
-
+		printf("PT_DDZ_USER_JIAOFEN, uid:%u\n", this->m_nUserId);
 	}
 		break;
 	case PT_DDZ_USER_PASS: {
-
+		printf("PT_DDZ_USER_PASS, uid:%u\n", this->m_nUserId);
 	}
 		break;
 
 	case PT_DDZ_GAME_START: {
 
+		printf("PT_DDZ_GAME_START, uid:%u\n", this->m_nUserId);
 		PT_DDZ_GAME_START_INFO * msg = (PT_DDZ_GAME_START_INFO *) packet->data;
 
 		memcpy(m_nCard, msg->pai, sizeof(signed int) * 17);
@@ -542,6 +546,8 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 		break;
 
 	case PT_DDZ_USER_JIAOPAI: {
+
+		printf("PT_DDZ_USER_JIAOPAI, uid:%u\n", this->m_nUserId);
 
 		PT_DDZ_USER_JIAOPAI_INFO * msg =
 				(PT_DDZ_USER_JIAOPAI_INFO *) packet->data;
@@ -562,10 +568,12 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 		break;
 	case PT_DDZ_GAME_END: {
 
+		printf("PT_DDZ_GAME_END, uid:%u\n", this->m_nUserId);
+
 	}
 		break;
 	case PT_DDZ_BALANCE: {
-
+		printf("PT_DDZ_BALANCE, uid:%u\n", this->m_nUserId);
 	}
 		break;
 

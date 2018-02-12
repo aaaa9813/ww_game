@@ -189,6 +189,9 @@ public:
 	CPeer * m_peer;
 
 
+	unsigned int m_nTableCard[20];
+	unsigned int m_nTableCardNum;
+
 	unsigned int m_nCurFen;
 	CTimer * m_pTimer;
 

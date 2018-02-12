@@ -19,13 +19,12 @@ CDDZGame::CDDZGame() {
 
 	memset(m_pUsers, 0, sizeof(CBaseUser *) * 3);
 	for (int i = 0; i < 54; ++i) {
-		m_iPai[i] = 13 * (i % 4) + i / 4;
+		m_iPai[i] = i + 1;
 	}
-	m_iPai[52] = 52;
-	m_iPai[53] = 53;
+
 	//============================================
 	for (int i = 0; i < 54; i++) {
-		g_DDZPaiInfo[i].id = i / 4 + 13 * (i % 4);
+		g_DDZPaiInfo[i].id = i / 4 + 13 * (i % 4) + 1;
 		g_DDZPaiInfo[i].num = i / 4 + 1;
 
 		g_DDZPaiInfo[i].type = i % 4;
@@ -41,9 +40,9 @@ CDDZGame::CDDZGame() {
 		if (i >= 52) {
 			g_DDZPaiInfo[i].type = 4;
 			g_DDZPaiInfo[52].value = 33;
-			g_DDZPaiInfo[52].id = 52;
+			g_DDZPaiInfo[52].id = 52 + 1;
 			g_DDZPaiInfo[53].value = 34;
-			g_DDZPaiInfo[53].id = 53;
+			g_DDZPaiInfo[53].id = 53 + 1;
 		}
 
 	}
@@ -236,6 +235,13 @@ void CDDZGame::StartGame() {
 		m_UserInfo[i].m_iJiaoFen = -1;
 		m_UserInfo[i].m_wDaPaiNum = 0;
 		m_UserInfo[i].m_iChuPaiNum = 0;
+
+		printf("===uid:%u pai:", m_pUsers[i]->GetId());
+		for(int j = 0; j < 17; j++)
+		{
+			printf("%d,", m_UserInfo[i].m_wPai[j]);
+		}
+		printf("===\n");
 	}
 
 	memcpy(m_iDiPai, &m_iPai[m_iNext], sizeof(int) * 3);
@@ -398,6 +404,7 @@ void CDDZGame::ChuPai(CPlayer * pUser, unsigned int pai[], unsigned int num) {
 		data.nUid = pUser->GetId();
 		memcpy(data.nPai, pai, sizeof(int) * num);
 
+		data.nActUid = m_pUsers[m_nCurUser]->GetId();
 //		for( int i = 0; i < num; i++ )
 //		{
 //			SDDZPai * p = GetDDZPaiInfo( pai[i] );
@@ -1205,7 +1212,7 @@ void CDDZGame::SetDiZhu(CPlayer * pUser, int num) {
 	PT_DDZ_DZPAI_INFO data1;
 	data1.wScore = num;
 	data1.dwUserId = pUser->GetId();
-	memcpy(data1.wPai, &m_iPai, sizeof(int) * 3);
+	memcpy(data1.wPai, &m_iDiPai, sizeof(int) * 3);
 	this->SendtoAll((char *) &data1, sizeof(data1));
 
 	m_nCurUser = pUser->m_iChairId;

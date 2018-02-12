@@ -53,6 +53,8 @@ struct SDDZUser {
 		m_iJiaoFen = -1;
 		m_wPaiNum = 17;
 		m_iChuPaiNum = 0;
+
+		memset(m_wPai, 0, sizeof(int) * 20);
 	}
 	unsigned int Uid;
 	int m_wPai[20];					//玩家手里的牌
