@@ -18,12 +18,37 @@ CDDZGame::CDDZGame() {
 	m_pUsers = new CBaseUser *[3];
 
 	memset(m_pUsers, 0, sizeof(CBaseUser *) * 3);
-	for (int i = 0; i < 54; ++i)
-		m_iPai[i] = i;
-	//m_wPai[i] = 13 * (i % 4) + i / 4;
-	//m_wPai[52] = 52;
-	//m_wPai[53] = 53;
+	for (int i = 0; i < 54; ++i) {
+		m_iPai[i] = 13 * (i % 4) + i / 4;
+	}
+	m_iPai[52] = 52;
+	m_iPai[53] = 53;
+	//============================================
+	for (int i = 0; i < 54; i++) {
+		g_DDZPaiInfo[i].id = i / 4 + 13 * (i % 4);
+		g_DDZPaiInfo[i].num = i / 4 + 1;
 
+		g_DDZPaiInfo[i].type = i % 4;
+
+		if (g_DDZPaiInfo[i].num > 2 && g_DDZPaiInfo[i].num < 14) {
+			g_DDZPaiInfo[i].value = g_DDZPaiInfo[i].num - 3;
+		} else if (g_DDZPaiInfo[i].num == 1) {
+			g_DDZPaiInfo[i].value = g_DDZPaiInfo[i].num + 10;
+		} else if (g_DDZPaiInfo[i].num == 2) {
+			g_DDZPaiInfo[i].value = g_DDZPaiInfo[i].num + 20;
+		}
+
+		if (i >= 52) {
+			g_DDZPaiInfo[i].type = 4;
+			g_DDZPaiInfo[52].value = 33;
+			g_DDZPaiInfo[52].id = 52;
+			g_DDZPaiInfo[53].value = 34;
+			g_DDZPaiInfo[53].id = 53;
+		}
+
+	}
+
+	//====================================================
 	m_iDiZhu = -1;
 	//m_bFirst = true;
 	m_bInGame = false;
@@ -1116,7 +1141,6 @@ void CDDZGame::JiaoPai(CPlayer *pUser, int num) {
 	data.nUid = pUser->GetId();
 	data.nNum = num;
 	data.nActUid = m_pUsers[m_nCurUser]->GetId();
-
 
 	this->SendtoAll((char *) &data, sizeof(data));
 
