@@ -12,7 +12,6 @@ class CPlayer:public CBaseUser
 		void Reset();
 	public:
 		//unsigned int	m_iChairId;
-		bool			m_bReady;
 
 		unsigned int	m_nGameId;///<在哪个游戏内,主机内
 

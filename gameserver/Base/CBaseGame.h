@@ -25,6 +25,8 @@ class CBaseGame:public CBaselist
 		virtual bool Net_Ready(unsigned int uid) = 0;
 
 
+		virtual bool GameEnd();
+
 		bool m_bDestroy;
 
 		virtual bool ProHostMsgByStream(unsigned int uid, unsigned char * data, unsigned int len) = 0;
@@ -85,6 +87,8 @@ class CBaseGame:public CBaselist
 
 		bool IsCanRejoinGame(){ return m_bIsCanRejoinGame; }
 		void SetCanRejoinGame( bool bCan ){ m_bIsCanRejoinGame = bCan; }
+
+
 };
 
 #endif

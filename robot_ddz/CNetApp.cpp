@@ -159,6 +159,9 @@ CUser::CUser() {
 
 	memset(m_nCard, 0, sizeof(unsigned int) * 20);
 	m_nCardNum = 0;
+	m_nTableCardUid = 0;
+
+	gamenum = 0;
 }
 CUser::~CUser() {
 	delete m_peer;
@@ -205,6 +208,16 @@ void CUser::SendChuPai() {
 	data.uid = this->m_nUserId;
 	GetChuPai(data.pai, data.painum);
 
+	bsData.Write((char *) &data, sizeof(data));
+	SendData(&bsData, m_ServerAddr);
+}
+
+void CUser::SendPass() {
+	RakNet::BitStream bsData;
+	bsData.Write((unsigned char) PT_HOST_MESSAGE);
+	bsData.Write((unsigned int) PT_DDZ_PASS);
+
+	PT_DDZ_PASS_INFO data;
 	bsData.Write((char *) &data, sizeof(data));
 	SendData(&bsData, m_ServerAddr);
 }
@@ -344,9 +357,9 @@ void CUser::OnTimer(int iTimerID) {
 		break;
 	case ON_CHU_PAI: {
 
-		if (m_nTableCardNum >= 1) {
+		if (m_nTableCardUid != m_nUserId) {
 
-			SendChuPai();
+			SendPass();
 		} else {
 
 			SendChuPai();
@@ -477,6 +490,7 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 
 		PT_DDZ_DZPAI_INFO * msg = (PT_DDZ_DZPAI_INFO *) packet->data;
 
+		m_nTableCardUid = msg->dwUserId;
 		if (msg->dwUserId == this->m_nUserId) {
 			memcpy(&m_nCard[17], msg->wPai, sizeof(unsigned int) * 3);
 			m_nCardNum = 20;
@@ -494,6 +508,7 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 
 		PT_DDZ_USER_CHUPAI_INFO * msg = (PT_DDZ_USER_CHUPAI_INFO *) packet->data;
 
+		m_nTableCardUid = msg->nUid;
 		//自己出的牌
 		if (msg->nUid == this->m_nUserId) {
 			//更新手牌
@@ -525,7 +540,14 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 	}
 		break;
 	case PT_DDZ_USER_PASS: {
+
 		printf("PT_DDZ_USER_PASS, uid:%u\n", this->m_nUserId);
+
+		PT_DDZ_USER_PASS_INFO * msg = (PT_DDZ_USER_PASS_INFO *) packet->data;
+
+		if (msg->nActUid == this->m_nUserId) {
+			SetTimer(ON_CHU_PAI, ON_CHU_PAI_TIME);
+		}
 	}
 		break;
 
@@ -569,6 +591,16 @@ bool CUser::ProHostMsgByStream(Packet * packet) {
 	case PT_DDZ_GAME_END: {
 
 		printf("PT_DDZ_GAME_END, uid:%u\n", this->m_nUserId);
+
+		PT_DDZ_GAME_END_INFO * msg = (PT_DDZ_GAME_END_INFO *)packet->data;
+
+
+
+		gamenum++;
+		printf("============game %d end\n", gamenum);
+
+
+		SetTimer(ON_ENTER_GAME, ON_ENTER_GAME_TIME);
 
 	}
 		break;

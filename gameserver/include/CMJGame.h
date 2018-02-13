@@ -194,7 +194,7 @@ class CMJGame:public CBaseGame
 		bool LeaveGame(unsigned int uid);
 
 		void GameStart();
-		void GameEnd();
+		bool GameEnd();
 
 	public:
 		unsigned int AllocIndex(unsigned uid);

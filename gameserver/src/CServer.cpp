@@ -123,7 +123,6 @@ void CServer::SendPack2Myself(unsigned char msgid, unsigned int nUserId,
 			writeStream.GetNumberOfBitsUsed());
 }
 
-
 void CServer::SendtoAllByStream(BitStream * datastream, CPlayer * pOutUser) {
 	for (map<unsigned int, CPlayer *>::iterator it = m_UListByUid.begin();
 			it != m_UListByUid.end(); ++it) {
@@ -416,9 +415,11 @@ void CServer::HandlePacketCmd() {
 				//pPlayer->m_nGameId = nGameId;
 				m_UListByUid[nUserId] = pPlayer;
 
-				PT_ENTER_GAME_ACCEPT_INFO data;
-				SendData((char *) &data, sizeof(data), pPlayer);
 			}
+
+			PT_ENTER_GAME_ACCEPT_INFO data;
+			SendData((char *) &data, sizeof(data), pPlayer);
+
 			Add2Matchlist(nUserId);
 		}
 			break;
@@ -596,35 +597,32 @@ bool CServer::ProHostMsgByStream(CPlayer * pUser, unsigned char * data,
 	}
 		return true;
 
-
 	case PT_DDZ_CHUPAI: {
 
-		PT_DDZ_CHUPAI_INFO * msg = (PT_DDZ_CHUPAI_INFO *)(data + 5);
+		PT_DDZ_CHUPAI_INFO * msg = (PT_DDZ_CHUPAI_INFO *) (data + 5);
 
-
-		((CDDZGame *)pGame)->ChuPai(pUser, msg->pai, msg->painum);
+		((CDDZGame *) pGame)->ChuPai(pUser, msg->pai, msg->painum);
 	}
 		return true;
 	case PT_DDZ_JIAOFEN: {
 
-		PT_DDZ_JIAOFEN_INFO * msg = (PT_DDZ_JIAOFEN_INFO *)(data + 5);
+		PT_DDZ_JIAOFEN_INFO * msg = (PT_DDZ_JIAOFEN_INFO *) (data + 5);
 
 		int fen = msg->nFen;
 
-		((CDDZGame *)pGame)->JiaoPai(pUser, fen);
+		((CDDZGame *) pGame)->JiaoPai(pUser, fen);
 	}
 		return true;
 	case PT_DDZ_PASS: {
-		((CDDZGame *)pGame)->PassPai(pUser);
+		PT_DDZ_PASS_INFO * msg = (PT_DDZ_PASS_INFO *) (data + 5);
+
+		((CDDZGame *) pGame)->PassPai(pUser);
 	}
 		return true;
 	}
 
-
 	return false;
 }
-
-
 
 //void CServerApp::OnMsgProc(CThreadCommand * pCmd)
 //{
@@ -878,7 +876,6 @@ bool CServer::ProHostMsgByStream(CPlayer * pUser, unsigned char * data,
 //}
 //
 
-
 void CServer::ReadConfig(string strConfigPath) {
 	xmlDocPtr doc; //定义解析文档指针
 	xmlNodePtr rootNode, childNode;
@@ -1022,7 +1019,6 @@ bool CServer::Init() {
 	return true;
 }
 
-
 unsigned long long CServer::GetTickCountEx() {
 	struct timespec ts;
 
@@ -1144,7 +1140,7 @@ void CServer::OnTimeMatch() {
 				it != m_Matchlist.end();) {
 			tmp[num] = it->second;
 
-		if (OnMatch(tmp[num])) {
+			if (OnMatch(tmp[num])) {
 				m_Matchlist.erase(it++);
 			} else {
 				it++;
@@ -1173,8 +1169,8 @@ void CServer::OnTimeMatch() {
 		}
 
 		PT_DDZ_MATCH_ACCEPT_INFO data;
-		data.serverid=0;
-		data.gameid=0;
+		data.serverid = 0;
+		data.gameid = 0;
 
 //		RakNet::BitStream ds;
 //		ds.Write((unsigned char) PT_HOST_MESSAGE);
@@ -1198,7 +1194,7 @@ void CServer::OnTimeMatch() {
 		}
 
 		//pGame->SendtoAllByStream(&ds);
-		pGame->SendtoAll((char *)&data, sizeof(data));
+		pGame->SendtoAll((char *) &data, sizeof(data));
 	}
 
 }

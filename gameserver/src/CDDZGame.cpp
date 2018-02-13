@@ -335,12 +335,13 @@ void CDDZGame::PassPai(CPlayer *pUser) {
 	if (pUser != m_pUsers[m_nCurUser])
 		return;
 
-	PT_DDZ_USER_PASS_INFO data;
-	data.nUid = pUser->GetId();
-	this->SendtoAll((char *) &data, sizeof(data));
-
 	m_iPassCount++;
 	MoveCurPointer();
+
+	PT_DDZ_USER_PASS_INFO data;
+	data.nUid = pUser->GetId();
+	data.nActUid = m_pUsers[m_nCurUser]->GetId();
+	this->SendtoAll((char *) &data, sizeof(data));
 
 	if (m_pUsers[m_nCurUser]->m_bDrop) {
 		SET_TIMER_ONCE(WAIT_DDZ_DAPAI_OFFLINE);
@@ -449,7 +450,7 @@ void CDDZGame::ChuPai(CPlayer * pUser, unsigned int pai[], unsigned int num) {
 			}
 
 			WinBalance(m_UserInfo[pUser->m_iChairId].m_bIsDiZhu);
-			EndGame();
+			GameEnd();
 		}
 
 	} else {
@@ -462,8 +463,8 @@ void CDDZGame::ChuPai(CPlayer * pUser, unsigned int pai[], unsigned int num) {
 		return;
 	}
 }
-void CDDZGame::EndGame() {
-	//CBaseGame::EndGame();
+bool CDDZGame::GameEnd() {
+	CBaseGame::GameEnd();
 
 #ifdef DDZ_DEBUG
 	g_strText.Format( L"斗地主 %s 第 %d 桌 结束\n", m_pRoom->GetName(), m_dwId );
@@ -474,9 +475,10 @@ void CDDZGame::EndGame() {
 	data.nGameId = this->GetId();
 	for (int i = 0; i < 3; i++) {
 		data.nPaiNum[i] = m_UserInfo[i].m_wPaiNum;
-		memcpy(data.nPai, m_UserInfo[i].m_wPai,
+		memcpy(data.nPai[i], m_UserInfo[i].m_wPai,
 				sizeof(int) * m_UserInfo[i].m_wPaiNum);
 	}
+
 	this->SendtoAll((char*) &data, sizeof(data));
 
 //	PT_UPDATE_SCORE_INFO data3;

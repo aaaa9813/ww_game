@@ -1,6 +1,7 @@
 #ifndef CBaseUser_H_
 #define CBaseUser_H_
 #include "CBase.h"
+
 class CBaseUser:public CBase
 {
 	public:

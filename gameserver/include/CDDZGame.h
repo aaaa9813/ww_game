@@ -146,7 +146,7 @@ protected:
 
 	void MoveAbandonCardToArrayLast( CPlayer * pUser, unsigned int AbandonPai[], int AbandonNum );
 	void WinBalance( bool bIsDiZhu );
-	void EndGame();
+	bool GameEnd();
 	void ResetTablePai();
 
 	int GetActIndex();

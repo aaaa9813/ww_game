@@ -29,7 +29,10 @@ CBaseGame::~CBaseGame()
 {
 
 }
-
+bool CBaseGame::GameEnd()
+{
+	this->m_bDestroy = true;
+}
 unsigned int CBaseGame::AllocIndex(unsigned int uid) {
 	for (int i = 0; i < INDEX_NUM; i++) {
 		if (m_nIndexlist[i] == 0) {

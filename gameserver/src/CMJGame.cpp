@@ -653,9 +653,9 @@ void CMJGame::Net_LaZhuang(unsigned int uid, unsigned int num) {
 	}
 }
 
-void CMJGame::GameEnd() {
+bool CMJGame::GameEnd() {
 
-	this->m_bDestroy = true;
+	CBaseGame::GameEnd();
 
 	for (map<unsigned int, CBaseUser *>::iterator it = m_Userlist.begin();
 			it != m_Userlist.end(); it++) {
@@ -666,6 +666,7 @@ void CMJGame::GameEnd() {
 		SendStreamtoUser(&streambuf, it->first);
 
 	}
+	return true;
 }
 
 void CMJGame::InitCard() {

@@ -363,6 +363,18 @@ struct PT_DDZ_CHUPAI_INFO {
 	}
 };
 
+struct PT_DDZ_PASS_INFO {
+
+	unsigned char id;
+
+	int nMsgid;
+
+	PT_DDZ_PASS_INFO() :
+
+			id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_PASS) {
+	}
+};
+
 struct PT_DDZ_JIAOFEN_INFO {
 
 	unsigned char id;
@@ -415,7 +427,7 @@ struct PT_DDZ_GAME_END_INFO {
 
 	int nGameId;
 	int nPaiNum[3];
-	int nPai[3];
+	int nPai[3][20];
 
 	PT_DDZ_GAME_END_INFO() :
 

@@ -63,7 +63,7 @@ enum {
 const int ON_ENTER_GAME_TIME = 1000;
 const int ON_LEAVE_GAME_TIME = 1000;
 const int ON_JIAO_FEN_TIME = 1000;
-const int ON_CHU_PAI_TIME = 1000;
+const int ON_CHU_PAI_TIME = 100;
 const int ON_HEART_JUMP_TIME = 1000;
 const int ON_READY_TIME = 1000;
 class CHostInfo {
@@ -134,6 +134,7 @@ public:
 
 	void SendJiaoFen(unsigned int ZhuangNum);
 	void SendChuPai();
+	void SendPass();
 	void SendDasaizi();
 	void SendDasaiziag();
 	void SendEntergame(unsigned serverid, unsigned int gameid, unsigned int uid);
@@ -191,6 +192,8 @@ public:
 
 	unsigned int m_nTableCard[20];
 	unsigned int m_nTableCardNum;
+	unsigned int m_nTableCardUid;
+
 
 	unsigned int m_nCurFen;
 	CTimer * m_pTimer;
@@ -201,6 +204,10 @@ public:
 	CHostInfo * m_pHost;
 	CHostInfo tmpCreatehost;//创建主机时，临时存放数据，等服务器返回成功后，加入主机列表。
 	CHostInfo tmpJoinhost;//tme join host
+
+
+	int gamenum;
+
 };
 
 class CNetApp {
