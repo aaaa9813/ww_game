@@ -24,7 +24,7 @@
 #if 1
 const char SERVER_IP[20] = "localhost";
 const unsigned short SERVER_PORT = 61000;//(200-202)
-const int ROBOT_NUM = 4;
+const int ROBOT_NUM = 40;
 const int ROOM_ID = 100;
 const int SERVER_ID=101;//(300-302)
 const int GAME_ID = 2;

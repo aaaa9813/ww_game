@@ -846,7 +846,7 @@ void CServer::Start(int argc, char ** argv) {
 	char message[100];
 	for (;;) {
 
-		usleep(1000);
+		usleep(100000);
 
 		m_lGameCounttime = GetTickCountEx();
 

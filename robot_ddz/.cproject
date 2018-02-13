@@ -43,8 +43,8 @@
 								<option id="gnu.cpp.link.option.libs.491063887" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="rt"/>
 									<listOptionValue builtIn="false" value="pthread"/>
-									<listOptionValue builtIn="false" value="raknet_ex_4065"/>
-									<listOptionValue builtIn="false" value="raknet_4065"/>
+									<listOptionValue builtIn="false" value=""/>
+									<listOptionValue builtIn="false" value="raknet_4082"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.83034718" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
