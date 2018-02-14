@@ -474,8 +474,9 @@ bool CDDZGame::GameEnd() {
 	PT_DDZ_GAME_END_INFO data;
 	data.nGameId = this->GetId();
 	for (int i = 0; i < 3; i++) {
-		data.nPaiNum[i] = m_UserInfo[i].m_wPaiNum;
-		memcpy(data.nPai[i], m_UserInfo[i].m_wPai,
+		data.paiinfo[i].num = m_UserInfo[i].m_wPaiNum;
+
+		memcpy(data.paiinfo[i].pai, m_UserInfo[i].m_wPai,
 				sizeof(int) * m_UserInfo[i].m_wPaiNum);
 	}
 

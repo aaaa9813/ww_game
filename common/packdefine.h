@@ -420,14 +420,20 @@ struct PT_DDZ_DZPAI_INFO {
 			id(PT_HOST_MESSAGE), nMsgid(PT_DDZ_DZPAI) {
 	}
 };
+
+struct SPaiInfo
+{
+	unsigned int num;
+	unsigned int pai[20];
+};
 struct PT_DDZ_GAME_END_INFO {
 	unsigned char id;
 
 	int nMsgid;
 
 	int nGameId;
-	int nPaiNum[3];
-	int nPai[3][20];
+	//剩余牌信息
+	SPaiInfo paiinfo[3];
 
 	PT_DDZ_GAME_END_INFO() :
 
