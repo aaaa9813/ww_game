@@ -6,50 +6,50 @@ enum GameMessages {
 	PT_NAT_HOST, PT_USER_LIST, PT_USER_ENTER,
 
 	//进入Game信息
-	PT_ENTER_GAME_REQUEST, 			///<进入房间申请135
+	PT_ENTER_GAME_REQUEST, 			///<进入房间申请140
 	PT_ENTER_GAME_ACCEPT, 			///<进入房间成功
 	PT_ENTER_GAME_FAILE, 			///<进入房间失败
 	PT_USER_ENTER_GAME, 			///<有人进入房间
 
 	//离开Game信息
-	PT_LEAVE_GAME_REQUEST, 			///<离开房间申请139
+	PT_LEAVE_GAME_REQUEST, 			///<离开房间申请144
 	PT_LEAVE_GAME_ACCEPT, 			///<离开房间成功
 	PT_LEAVE_GAME_FAILE, 			///<离开房间失败
 	PT_USER_LEAVE_GAME, 			///<有人离开房间
 
 	//进入房间信息
-	PT_ENTER_ROOM_REQUEST, 			///<进入房间申请 143
+	PT_ENTER_ROOM_REQUEST, 			///<进入房间申请 148
 	PT_ENTER_ROOM_ACCEPT, 			///<进入房间成功
 	PT_ENTER_ROOM_FAILE, 			///<进入房间失败
 	PT_USER_ENTER_ROOM, 			///<有人进入房间
 
 	//离开房间信息
-	PT_LEAVE_ROOM_REQUEST, 			///<离开房间申请147
+	PT_LEAVE_ROOM_REQUEST, 			///<离开房间申请152
 	PT_LEAVE_ROOM_ACCEPT, 			///<离开房间成功
 	PT_LEAVE_ROOM_FAILE, 			///<离开房间失败
 	PT_USER_LEAVE_ROOM, 			///<有人离开房间
 
 	//创建主机信息
-	PT_CREATE_HOST_REQUEST, 		///<创建主机申请151
+	PT_CREATE_HOST_REQUEST, 		///<创建主机申请156
 	PT_CREATE_HOST_ACCEPT, 			///<创建主机成功
 	PT_CREATE_HOST_FAILE, 			///<创建主机失败
 	PT_USER_CREATE_HOST, 			///<有人创建主机
 
 	//加入主机信息
-	PT_JOIN_HOST_REQUEST, 			///<加入主机申请155
+	PT_JOIN_HOST_REQUEST, 			///<加入主机申请160
 	PT_JOIN_HOST_ACCEPT, 			///<加入主机成功
 	PT_JOIN_HOST_FAILE, 			///<加入主机失败
 	PT_USER_JOIN_HOST, 				///<有人加入主机
 
 	//离开主机信息
-	PT_LEAVE_HOST_REQUEST, 			///<加入主机申请159
+	PT_LEAVE_HOST_REQUEST, 			///<加入主机申请164
 	PT_LEAVE_HOST_ACCEPT, 			///<加入主机成功
 	PT_LEAVE_HOST_FAILE, 			///<加入主机失败
 	PT_USER_LEAVE_HOST, 			///<有人加入主机
 	//游戏开始
 	PT_GAME_START, 					///<游戏开始
 	//游戏结束
-	PT_GAME_END, 					///<游戏结束
+	PT_GAME_END, 					///<游戏结束169
 	//游戏奖励
 	PT_AWARD,						///<发送奖励给玩家
 	PT_SERVER_CLOSE,				///<send to user when server will close
@@ -61,15 +61,15 @@ enum GameMessages {
 	PT_PROXY_TRANSMISSION,  		///<通过server代理转发的数据包
 	PT_SYNCHRONOUSTIME, 			///<同步时间 该PT在PT_PROXY_TRANSMISSION后面
 	PT_HOST_LIST,					///<主机列表
-	PT_HOST_MESSAGE,				///<175
+	PT_HOST_MESSAGE,				///<180
 	PT_SERVER_PROXY,				///<服务转发
 	PT_CHANGE_HOST,					///<while host id change;
 	PT_ROOM_USER_LIST,				//<玩家列表
 	PT_SERVER_IDENTIFY_NOTIFY,		///<服务器之间的身份声明
-	PT_ROOM_TO_PROXY,  				///<180
+	PT_ROOM_TO_PROXY,  				///<185
 	PT_USER_CONNECT,				///<玩家连接后，代理服务器通知房间服务器
 	PT_USER_DISCONNECT,				///<玩家断线后，代理服务器通知房间服务器
-	PT_USER_HEART_JUMP,				///<客户端心跳包
+	PT_USER_HEART_JUMP,				///<客户端心跳包188
 	PT_USER_RECONNECT,				///<玩家重连
 	PT_USER_INGAME_MSG = 255,
 };
@@ -228,6 +228,7 @@ enum HOSTMSG {
 	PT_DDZ_CHUPAI = 200,
 	PT_DDZ_JIAOFEN,
 	PT_DDZ_PASS,
+
 
 	PT_DDZ_USER_CHUPAI,
 	PT_DDZ_USER_JIAOFEN,
