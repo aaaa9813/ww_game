@@ -1215,6 +1215,7 @@ void CDDZGame::SetDiZhu(CPlayer * pUser, int num) {
 	PT_DDZ_DZPAI_INFO data1;
 	data1.wScore = num;
 	data1.dwUserId = pUser->GetId();
+	data1.nActUid = pUser->GetId();
 	memcpy(data1.wPai, &m_iDiPai, sizeof(int) * 3);
 	this->SendtoAll((char *) &data1, sizeof(data1));
 
