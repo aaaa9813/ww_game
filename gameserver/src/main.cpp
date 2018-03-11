@@ -3,7 +3,7 @@
 #include "time.h"
 #include "CServer.h"
 
-#include "protobuf/servertst.h"
+
 /*
 struct SCard
 {
