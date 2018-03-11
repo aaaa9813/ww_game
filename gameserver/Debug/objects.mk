@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lpthread -lprotobuf -lrt -lraknet_4082 -lxml2
+LIBS := -lpthread -lrt -lraknet_4082 -lxml2
 

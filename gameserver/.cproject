@@ -45,10 +45,9 @@
 								</option>
 								<option id="gnu.cpp.link.option.libs.661754542" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="pthread"/>
-									<listOptionValue builtIn="false" value="protobuf"/>
+									<listOptionValue builtIn="false" value=""/>
 									<listOptionValue builtIn="false" value="rt"/>
 									<listOptionValue builtIn="false" value="raknet_4082"/>
-									<listOptionValue builtIn="false" value=""/>
 									<listOptionValue builtIn="false" value="xml2"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1062087948" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
