@@ -24,8 +24,8 @@
 								<option id="gnu.cpp.compiler.exe.debug.option.optimization.level.1033939565" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1150325267" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1523782878" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="../../raknet_ex_4065"/>
-									<listOptionValue builtIn="false" value="../../raknet_4065/include"/>
+									<listOptionValue builtIn="false" value="../../raknet4082/Source"/>
+									<listOptionValue builtIn="false" value=""/>
 									<listOptionValue builtIn="false" value="../../common"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1669831247" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>

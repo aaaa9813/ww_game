@@ -22,6 +22,7 @@
 #include "BitStream.h"
 
 #if 1
+//const char SERVER_IP[20] = "35.196.108.73";
 const char SERVER_IP[20] = "localhost";
 const unsigned short SERVER_PORT = 61000;//(200-202)
 const int ROBOT_NUM = 2;
