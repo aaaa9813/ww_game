@@ -18,6 +18,29 @@ CNetApp::CNetApp() {
 
 	m_CurId = 0;
 
+	for (int i = 0; i < 54; i++) {
+		g_DDZPaiInfo[i].id = i / 4 + 13 * (i % 4);
+		g_DDZPaiInfo[i].num = i / 4 + 1;
+
+		g_DDZPaiInfo[i].type = i % 4;
+
+		if (g_DDZPaiInfo[i].num > 2 && g_DDZPaiInfo[i].num < 14) {
+			g_DDZPaiInfo[i].value = g_DDZPaiInfo[i].num - 3;
+		} else if (g_DDZPaiInfo[i].num == 1) {
+			g_DDZPaiInfo[i].value = g_DDZPaiInfo[i].num + 10;
+		} else if (g_DDZPaiInfo[i].num == 2) {
+			g_DDZPaiInfo[i].value = g_DDZPaiInfo[i].num + 20;
+		}
+
+		if (i >= 52) {
+			g_DDZPaiInfo[i].type = 4;
+			g_DDZPaiInfo[52].value = 33;
+			g_DDZPaiInfo[52].id = 52;
+			g_DDZPaiInfo[53].value = 34;
+			g_DDZPaiInfo[53].id = 53;
+		}
+
+	}
 }
 
 CNetApp::~CNetApp() {
@@ -103,7 +126,24 @@ bool CUser::SendtoOtherbyProxy(const char* pszData, int nDataLen,
 
 	return true;
 }
+int CUser::GetPaiByType(DDZ_PAI_TYPE type, int value)
+{
+	for(int i = 0; i < m_nCardNum; i++)
+	{
+		
+	}
+}
+int CUser::CheckPaiType(unsigned int pai[], int num)
+{
+	SDDZPai card[20];
+	for(int i = 0; i < num; i++)
+	{
+		card[i] = *GetDDZPaiInfo(pai[i]);
+	}
 
+	int cardvalue=0;
+	CheckPaiType(card, num, cardvalue);
+}
 bool CUser::createProxyPacket(RakNet::BitStream& inBitStream,
 		RakNet::BitStream * outBitStream, int nUserIDorAll) {
 	int nSendNums;
@@ -360,6 +400,8 @@ void CUser::OnTimer(int iTimerID) {
 		if (m_nTableCardUid != m_nUserId) {
 
 			SendPass();
+
+			CheckPaiType(m_nTableCard, m_nTableCardNum);
 		} else {
 
 			SendChuPai();
@@ -743,4 +785,418 @@ bool CUser::Run() {
 	}
 
 	return true;
+}
+
+
+int CUser::CheckPaiType( SDDZPai pai[], int num, int &PaiSize )
+{
+	if( num == 0 )
+		return PAI_TYPE_NONE;
+
+	SortCard( pai, num );
+	if( num == 1 )
+	{
+		PaiSize = pai[0].value;
+		return PAI_TYPE_SINGLE;
+	}
+	if( _IsRocket( pai, num ) )
+		return PAI_TYPE_ROCKET;
+
+	PaiSize = _Is2( pai, num );
+	if( PaiSize != -1 )
+		return PAI_TYPE_DOUBLE;
+
+	PaiSize = _Is3( pai, num );
+	if( PaiSize != -1 )
+		return PAI_TYPE_THREE;
+
+	PaiSize = _IsBomb( pai, num );
+	if( PaiSize != -1 )
+		return PAI_TYPE_BOMB;
+
+	PaiSize = _IsSanDaiYiSingle( pai, num );
+	if( PaiSize != -1 )
+		return PAI_TYPE_SANDAIYISINGLE;
+
+	PaiSize = _IsSanDaiYiDouble( pai, num );
+	if( PaiSize != -1 )
+		return PAI_TYPE_SANDAIYIDOUBLE;
+
+	PaiSize = _IsDanShun( pai, num );
+	if( PaiSize != -1 )
+		return PAI_TYPE_DANSHUN;
+
+	PaiSize = _IsShuangShun( pai, num );
+	if( PaiSize != -1 )
+		return PAI_TYPE_SHUANGSHUN;
+
+	PaiSize = _IsSanShun( pai, num );
+	if( PaiSize != -1 )
+		return PAI_TYPE_SANSHUN;
+
+	PaiSize = _IsPlaneSingle( pai, num );
+	if( PaiSize != -1 )
+		return PAI_TYPE_PLANESINGLE;
+
+	PaiSize = _IsPlaneDouble( pai, num );
+	if( PaiSize != -1 )
+		return PAI_TYPE_PLANEDOUBLE;
+
+	PaiSize = _IsSiDaiErSingle( pai, num );
+	if( PaiSize != -1 )
+		return PAI_TYPE_SIDAIERSINGLE;
+
+	PaiSize = _IsSiDaiErDouble( pai, num );
+	if( PaiSize != -1 )
+		return PAI_TYPE_SIDAIERDOUBLE;
+
+	return PAI_TYPE_NONE;
+}
+// 检测是否为火箭牌型
+bool CUser::_IsRocket( SDDZPai pai[], int num )
+{
+	if( num != 2)
+		return false;
+
+	if( pai[0].type == 4 && pai[1].type == 4 )
+		return true;
+
+	return false;
+}
+
+int CUser::_Is2( SDDZPai pai[], int num )
+{
+	if( num != 2 )
+		return -1;
+
+	if( pai[0].value == pai[1].value )
+		return pai[0].value;
+
+	return -1;
+}
+
+int CUser::_Is3( SDDZPai pai[], int num )
+{
+	if( num == 3 )
+	{
+		if( pai[0].value == pai[1].value && pai[0].value == pai[2].value )
+			return pai[0].value;
+	}
+
+	return -1;
+}
+
+// 检测是否为炸弹牌型
+int CUser::_IsBomb( SDDZPai pai[], int num )
+{
+	if( num != 4 )
+		return -1;
+
+	int iPaiNum = pai[0].value;
+	for( int i = 1; i < 4; i++ )
+	{
+		if( pai[i].value != iPaiNum )
+			return -1;
+    }
+	return pai[0].value;
+}
+
+// 检测是否为单顺牌型
+int CUser::_IsDanShun( SDDZPai pai[], int num )
+{
+	if( num < 5 )
+		return -1;
+
+	int iPaiNum = pai[0].value;
+	for( int i = 1; i < num; i ++ )
+	{
+			if( pai[i].value != (iPaiNum + i)%13 )
+		{
+			return -1;
+		}
+	}
+	return pai[0].value;
+}
+
+// 检测是否为双顺牌型
+int CUser::_IsShuangShun( SDDZPai pai[], int num )
+{
+	if( num < 6 || num % 2 != 0 )
+		return -1;
+
+	if( pai[0].value != pai[1].value )
+		return -1;
+
+	int k = 0;
+	int iPaiNum = pai[0].value;
+	for( int i = 2; i < num; i += 2 )
+	{
+		k++;
+	if( pai[i].value != (iPaiNum + k) % 13 )
+			return -1;
+	}
+	iPaiNum = pai[1].value;
+	k = 0;
+	for( int i = 3; i < num; i += 2 )
+	{
+		k++;
+		if( pai[i].value != (iPaiNum + k)%13 )
+			return -1;
+	}
+	return pai[0].value;
+}
+
+// 检测是否为三顺牌型
+int CUser::_IsSanShun( SDDZPai pai[], int num )
+{
+	if( num < 6 || num % 3 != 0 )
+		return -1;
+
+	int iPaiNum = pai[0].value;
+	for( int i = 0; i < num; i += 3 )
+	{
+		if( iPaiNum == pai[i+1].value && iPaiNum == pai[i+2].value && iPaiNum == pai[i].value)
+			iPaiNum++; //需要判断　PaiNum == pai[i].num
+		else
+			return -1;
+	}
+	return pai[0].value;
+}
+
+// 检测是否为三带一牌型(单张)
+int CUser::_IsSanDaiYiSingle( SDDZPai pai[], int num )
+{
+	if( num != 4 )
+		return -1;
+
+	if( GetCardCountByCardNum( pai, num, pai[0].num ) == 3 )
+		return pai[0].value;
+	else
+		if( GetCardCountByCardNum( pai, num, pai[0].num ) == 1 )
+			if( GetCardCountByCardNum( pai, num, pai[1].num ) == 3  )
+				return pai[1].value;
+
+	return -1;
+}
+// 检测是否为三带一牌型(对儿)
+int CUser::_IsSanDaiYiDouble( SDDZPai pai[], int num )
+{
+	if( num != 5 )
+		return -1;
+
+	if( GetCardCountByCardNum( pai, num, pai[0].num ) == 3 )
+	{
+		if(  GetCardCountByCardNum( pai, num, pai[3].num ) == 2 && pai[3].type != 4 )//不能带一对儿王
+			return pai[0].value;
+	}
+	else
+	{
+		if(  GetCardCountByCardNum( pai, num, pai[0].num ) == 2 && pai[0].type != 4 )
+			if(  GetCardCountByCardNum( pai, num, pai[2].num ) == 3 )
+				return pai[2].value;
+	}
+
+	return -1;
+}
+
+// 检测是否为飞机带翅膀牌型(单张)
+int CUser::_IsPlaneSingle( SDDZPai pai[], int num )
+{
+	if( num % 4 != 0 || num < 8 )
+		return -1;
+
+	int iLian = num / 4;	//记录一共可以连几次
+	int iBegin = -1;		//三张牌开始的位置
+
+	// 查找第一个三张牌的位置
+	for( int i = 0; i < num; i++ )
+	{
+		if( GetCardCountByCardNum( pai, num, pai[i].num ) == 3 )
+		{
+			iBegin = i;
+			break;
+		}
+	}
+
+	if( iBegin == -1 )
+		return -1;
+
+	// 检测连牌是否全为３张,并且是否连续
+	//int iPaiValue = pai[iBegin].value;
+	//for( int i = iBegin + 3; i < iLian * 3 + iBegin; i += 3 )
+	//{
+	//	if( GetCardCountByCardNum( pai, num, pai[i].num ) != 3 )
+	//		return -1;
+	//	if( iPaiValue + 1 != pai[i].value )
+	//		return -1;
+	//	else
+	//		iPaiValue++;
+	//}
+
+	for( int i = iBegin; i < iBegin + iLian * 3; i++ )
+	{
+		if( GetCardCountByCardNum( pai, num, pai[i].num ) != 3 )
+		{
+			return -1;
+		}
+	}
+
+	for( int i = 0; i < iLian; i++ )
+	{
+		if( pai[iBegin].value + i != pai[iBegin + 3 * i].value )
+			return  -1;
+	}
+
+	// 检测连牌的前面是否全为单张
+	for( int i = 0; i < iBegin; i++ )
+	{
+		if( GetCardCountByCardNum( pai, num, pai[i].num ) != 1 )
+			return -1;
+	}
+	// 检测连牌的后面是否全为单张
+	for( int i = iBegin + iLian * 3; i < num; i++ )
+	{
+		if( GetCardCountByCardNum( pai, num, pai[i].num ) != 1 )
+			return -1;
+	}
+
+	return pai[iBegin].value;
+}
+// 检测是否为飞机带翅膀牌型(对儿)
+int CUser::_IsPlaneDouble( SDDZPai pai[], int num )
+{
+	if( num % 5 != 0 || num < 10 )
+		return -1;
+
+	int iLian = num / 5;	//记录一共可以连几次
+	int iBegin = -1;		//三张牌开始的位置
+
+	for( int i = 0; i < num; i++ )
+	{
+		if( GetCardCountByCardNum( pai, num, pai[i].num ) == 3 )
+		{
+			iBegin = i;
+			break;
+		}
+    }
+
+	if( iBegin == -1 )
+		return -1;
+
+	for( int i = iBegin; i < iBegin + iLian * 3; i++ )
+	{
+		if( GetCardCountByCardNum( pai, num, pai[i].num ) != 3 )
+		{
+			return -1;
+		}
+	}
+
+	for( int i = 0; i < iLian; i++ )
+	{
+		if( pai[iBegin].value + i != pai[iBegin + 3 * i].value )
+			return  -1;
+
+	}
+
+	for( int i = 0; i < iBegin; i += 2 )
+	{
+		if( GetCardCountByCardNum( pai, num, pai[i].num ) != 2 )
+			return -1;
+	}
+
+	for( int i = iBegin + iLian * 3; i < num; i += 2 )
+	{
+		if( GetCardCountByCardNum( pai, num, pai[i].num ) != 2 )
+			return -1;
+	}
+
+	return pai[iBegin].value;
+}
+
+// 检测是否为四带二牌型(单张)
+int CUser::_IsSiDaiErSingle( SDDZPai pai[], int num)
+{
+	if( num != 6 )
+		return -1;
+
+	// 判断一张是单张并有四张相同时，即为是
+	if( GetCardCountByCardNum( pai, num, pai[0].num ) == 1
+		&& GetCardCountByCardNum( pai, num, pai[2].num ) == 4 )
+	{
+		return pai[2].value;
+	}
+	if ( GetCardCountByCardNum( pai, num, pai[0].num ) == 4
+		&& GetCardCountByCardNum( pai, num, pai[4].num ) == 1 )
+	{
+		return pai[0].value;
+	}
+
+	return -1;
+}
+// 检测是否为四带二牌型(对儿)
+int CUser::_IsSiDaiErDouble( SDDZPai pai[], int num)
+{
+	if ( num != 8 )
+		return -1;
+
+	if( GetCardCountByCardNum( pai, num, pai[0].num ) == 2
+		&& GetCardCountByCardNum( pai, num, pai[2].num ) == 2
+		&& GetCardCountByCardNum( pai, num, pai[4].num ) == 4)
+	{
+		return pai[4].value;
+	}
+
+	if( GetCardCountByCardNum( pai, num, pai[0].num ) == 2
+		&& GetCardCountByCardNum( pai, num, pai[2].num ) == 4
+		&& GetCardCountByCardNum( pai, num, pai[6].num ) == 2)
+	{
+		return pai[2].value;
+	}
+
+	if( GetCardCountByCardNum( pai, num, pai[0].num ) == 4
+		&& GetCardCountByCardNum( pai, num, pai[4].num ) == 2
+		&& GetCardCountByCardNum( pai, num, pai[6].num ) == 2 )
+	{
+		return pai[0].value;
+	}
+
+	return -1;
+}
+
+int CUser::GetCardCountByCardNum( SDDZPai pai[], int num, int PaiNum )
+{
+	int wCount = 0;
+	for( int i = 0; i < num; i++ )
+	{
+		if( pai[i].num == PaiNum )
+			wCount++;
+	}
+	return wCount;
+}
+
+void CUser::SortCard( SDDZPai Card[], int num )
+{
+	for( int i = 0; i < num - 1; i++ )
+	{
+		int k = i;
+		for( int j = i + 1; j < num; j++ )
+		{
+			if( Card[k].value > Card[j].value )
+				k = j;
+		}
+		if( k != i )
+		{
+			SDDZPai tmp = Card[k];
+			Card[k] = Card[i];
+			Card[i] = tmp;
+		}
+	}
+}
+SDDZPai g_DDZPaiInfo[54];
+SDDZPai * GetDDZPaiInfo(int wId) {
+	for (int i = 0; i < 54; i++) {
+		if (g_DDZPaiInfo[i].id == wId)
+			return &g_DDZPaiInfo[i];
+	}
+	return NULL;
 }
