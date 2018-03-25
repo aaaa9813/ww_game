@@ -126,13 +126,7 @@ bool CUser::SendtoOtherbyProxy(const char* pszData, int nDataLen,
 
 	return true;
 }
-int CUser::GetPaiByType(DDZ_PAI_TYPE type, int value)
-{
-	for(int i = 0; i < m_nCardNum; i++)
-	{
-		
-	}
-}
+
 int CUser::CheckPaiType(unsigned int pai[], int num)
 {
 	SDDZPai card[20];
